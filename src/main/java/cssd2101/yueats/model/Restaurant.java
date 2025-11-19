@@ -1,14 +1,9 @@
 package cssd2101.yueats.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("CUSTOMER")
-public class Customer extends User {
-
-
-
-
+@DiscriminatorValue("RESTAURANT")
+public class Restaurant extends User{
 }
