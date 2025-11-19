@@ -11,7 +11,7 @@ import lombok.Setter;
 @DiscriminatorColumn(name="user_role",discriminatorType = DiscriminatorType.STRING)
 @Getter
 @Setter
-@Table(name = "app_user")
+@Table(name="app_user")
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +29,4 @@ public abstract class User {
     @Enumerated(EnumType.STRING)
     @Column(name="user_role",nullable = false,updatable = false,insertable = false)
     private UserRole userRole;
-
-
 }

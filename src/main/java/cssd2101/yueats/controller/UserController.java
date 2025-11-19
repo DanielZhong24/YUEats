@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
-    @GetMapping
+    @GetMapping("/")
     public String index() {
-        return "Hello World";
+        return "index";
     }
 }
