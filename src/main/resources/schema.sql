@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS app_user (
 CREATE TABLE IF NOT EXISTS restaurants (
     id IDENTITY PRIMARY KEY,
     owner_id INTEGER NOT NULL,
+    restaurant_name VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES app_user(id)
 );
 
