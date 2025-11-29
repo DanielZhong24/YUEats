@@ -3,8 +3,11 @@ package cssd2101.yueats.model;
 
 import cssd2101.yueats.types.UserRole;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -12,6 +15,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="app_user")
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
