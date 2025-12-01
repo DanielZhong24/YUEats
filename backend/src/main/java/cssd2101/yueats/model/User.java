@@ -58,4 +58,7 @@ public abstract class User {
     @Enumerated(EnumType.STRING)
     @Column(name="user_role",nullable = false,updatable = false,insertable = false)
     private UserRole userRole;
+
+    @Column(name="is_verified")
+    private boolean isVerified=false;
 }
