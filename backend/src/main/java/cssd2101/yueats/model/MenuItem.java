@@ -1,9 +1,17 @@
 package cssd2101.yueats.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@Builder
 @Table(name = "menu_items")
+@NoArgsConstructor
+@AllArgsConstructor
 public class MenuItem {
 
     @Id

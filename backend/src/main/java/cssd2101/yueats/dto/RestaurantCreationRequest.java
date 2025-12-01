@@ -1,4 +1,17 @@
 package cssd2101.yueats.dto;
 
-public record RestaurantCreationRequest(String name, String address, Integer ownerId) {
+import cssd2101.yueats.model.User;
+import lombok.*;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class RestaurantCreationRequest {
+    private Integer id;
+    private String restaurantName;
+    private User owner;
+    private String address;
+
 }

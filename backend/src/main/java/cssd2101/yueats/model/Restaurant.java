@@ -2,13 +2,21 @@ package cssd2101.yueats.model;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name="restaurants")
+@Data
+@Builder
+@Getter
+@Setter
 @DiscriminatorValue("RESTAURANT")
+@NoArgsConstructor
+@AllArgsConstructor
+
 public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
