@@ -1,8 +1,10 @@
 package cssd2101.yueats.service;
 
 import cssd2101.yueats.dto.CustomerSignupRequest;
+import cssd2101.yueats.dto.VendorSignupRequest;
 import cssd2101.yueats.factory.UserFactory;
 import cssd2101.yueats.model.Customer;
+import cssd2101.yueats.model.Vendor;
 import cssd2101.yueats.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,14 @@ public class UserService {
         }
 
         return userRepository.save(userFactory.createCustomer(dto));
+    }
+
+    public Vendor registerVendor(VendorSignupRequest dto){
+        if(userRepository.existsByEmail(dto.email())){
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        return userRepository.save(userFactory.createVendor(dto));
     }
 
 }
