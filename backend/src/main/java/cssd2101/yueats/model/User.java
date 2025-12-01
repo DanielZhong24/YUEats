@@ -33,7 +33,6 @@ public abstract class User {
     private String email;
 
     @Column(nullable=false)
-    @NotBlank(message = "Password is mandatory")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=()])(?=\\S+$).{8,32}$", message = "Password must be between 8 and 32 characters, contain at least one number, " +
             "one lowercase letter, one uppercase letter, " +
             "and one special character")

@@ -148,7 +148,9 @@ class CustomerSignupIntegrationTest {
                 .andExpect(jsonPath("$.firstName").value("First name cannot be blank"))
                 .andExpect(jsonPath("$.lastName").value("Last name cannot be blank"))
                 .andExpect(jsonPath("$.phoneNumber").value("Phone number must only contain 10 digits"))
-                .andExpect(jsonPath("$.passwordHash").value("Password is mandatory"));
+                .andExpect(jsonPath("$.passwordHash").value("Password must be between 8 and 32 characters, contain at least one number, " +
+                        "one lowercase letter, one uppercase letter, " +
+                        "and one special character"));
     }
 
 
