@@ -3,6 +3,7 @@ package cssd2101.yueats.controller;
 import cssd2101.yueats.dto.CustomerSignupRequest;
 import cssd2101.yueats.model.Customer;
 import cssd2101.yueats.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class CustomerController {
     }
 
     @PostMapping("signup")
-    public ResponseEntity<Customer> signup(@RequestBody CustomerSignupRequest dto){
+    public ResponseEntity<Customer> signup(@Valid @RequestBody CustomerSignupRequest dto){
         Customer customer = userService.registerCustomer(dto);
         return new ResponseEntity<>(customer, HttpStatus.CREATED);
     }
