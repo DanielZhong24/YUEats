@@ -1,4 +1,14 @@
 package cssd2101.yueats.dto;
+import lombok.*;
 
-public record RestaurantCreationRequest(String name, String address, Integer ownerId) {
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class RestaurantCreationRequest {
+    private String restaurantName;
+    private Integer ownerId;
+    private String address;
+
 }
