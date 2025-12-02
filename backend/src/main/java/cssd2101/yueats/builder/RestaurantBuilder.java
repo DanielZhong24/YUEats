@@ -8,11 +8,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class RestaurantBuilder {
     public Restaurant createRestaurant(RestaurantCreationRequest dto, Vendor owner) {
-        return Restaurant.builder()
+        Restaurant restaurant = Restaurant.builder()
                 .restaurantName(dto.restaurantName())
                 .owner(owner)
                 .address(dto.address())
                 .build();
 
+        owner.addRestaurant(restaurant);
+        return restaurant;
     }
 }

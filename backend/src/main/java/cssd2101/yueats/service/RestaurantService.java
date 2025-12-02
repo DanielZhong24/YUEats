@@ -30,9 +30,8 @@ public class RestaurantService {
             throw new IllegalArgumentException("User is not a vendor");
         }
 
-        return restaurantRepository.save(restaurantBuilder.createRestaurant(req, (Vendor) user));
-
+        Vendor vendor = (Vendor) user;
+        Restaurant restaurant = restaurantBuilder.createRestaurant(req, vendor);
+        return restaurantRepository.save(restaurant);
     }
-
-
 }

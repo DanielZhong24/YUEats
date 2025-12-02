@@ -2,10 +2,13 @@ package cssd2101.yueats.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cssd2101.yueats.dto.RestaurantCreationRequest;
 import cssd2101.yueats.dto.VendorSignupRequest;
+import cssd2101.yueats.model.Restaurant;
 import cssd2101.yueats.model.User;
 import cssd2101.yueats.model.Vendor;
 import cssd2101.yueats.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
+@Transactional
 @AutoConfigureMockMvc
 public class VendorRestaurantCreateTest {
     @Autowired
@@ -58,5 +62,11 @@ public class VendorRestaurantCreateTest {
 
         mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restaurantDto))).andExpect(status().isCreated());
+
+        RestaurantCreationRequest restaurantDto2 = new RestaurantCreationRequest("popeyes", vendor.getId(), "345 down street");
+        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(restaurantDto2))).andExpect(status().isCreated());
+
+        assertEquals(2, vendor.getOwnedRestaurants().size());
     }
 }

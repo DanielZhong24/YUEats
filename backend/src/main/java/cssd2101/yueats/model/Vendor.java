@@ -24,7 +24,18 @@ public class Vendor extends User{
 
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Restaurant> ownedRestaurants = new ArrayList<Restaurant>();
+    private List<Restaurant> ownedRestaurants = new ArrayList<>();
 
+    public List<Restaurant> getOwnedRestaurants() {
+        if (ownedRestaurants == null) {
+            ownedRestaurants = new ArrayList<>();
+        }
+        return ownedRestaurants;
+    }
+
+    public void addRestaurant(Restaurant restaurant) {
+        ownedRestaurants.add(restaurant);
+        restaurant.setOwner(this);
+    }
 }
 
