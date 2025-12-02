@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/restaurants")
+@RequestMapping("restaurants")
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
@@ -22,7 +22,7 @@ public class RestaurantController {
         this.restaurantService = restaurantService;
     }
 
-    @PostMapping("create")
+    @PostMapping("/create")
     public ResponseEntity<Restaurant> createRestaurant(@RequestBody RestaurantCreationRequest restaurant) {
         Restaurant rest = restaurantService.createRestaurant(restaurant);
         return new ResponseEntity<>(rest, HttpStatus.CREATED);

@@ -4,6 +4,7 @@ import cssd2101.yueats.builder.RestaurantBuilder;
 import cssd2101.yueats.dto.RestaurantCreationRequest;
 import cssd2101.yueats.model.Restaurant;
 import cssd2101.yueats.model.User;
+import cssd2101.yueats.model.Vendor;
 import cssd2101.yueats.repository.RestaurantRepository;
 import cssd2101.yueats.repository.UserRepository;
 import cssd2101.yueats.types.UserRole;
@@ -22,14 +23,14 @@ public class RestaurantService {
     }
 
     public Restaurant createRestaurant(RestaurantCreationRequest req) {
-        User user = userRepository.findById(Long.valueOf(req.getOwnerId())).
+        User user = userRepository.findById(Long.valueOf(req.ownerId())).
                 orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user.getUserRole() != UserRole.RESTAURANT) {
-            throw new IllegalArgumentException("User is not a restaurant");
+        if (user.getUserRole() != UserRole.VENDOR) {
+            throw new IllegalArgumentException("User is not a vendor");
         }
 
-        return restaurantRepository.save(restaurantBuilder.createRestaurant(req, user));
+        return restaurantRepository.save(restaurantBuilder.createRestaurant(req, (Vendor) user));
 
     }
 

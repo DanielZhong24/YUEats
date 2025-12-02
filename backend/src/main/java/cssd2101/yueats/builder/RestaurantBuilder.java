@@ -2,16 +2,16 @@ package cssd2101.yueats.builder;
 
 import cssd2101.yueats.dto.RestaurantCreationRequest;
 import cssd2101.yueats.model.Restaurant;
-import cssd2101.yueats.model.User;
+import cssd2101.yueats.model.Vendor;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RestaurantBuilder {
-    public Restaurant createRestaurant(RestaurantCreationRequest dto, User owner) {
+    public Restaurant createRestaurant(RestaurantCreationRequest dto, Vendor owner) {
         return Restaurant.builder()
-                .restaurantName(dto.getRestaurantName())
+                .restaurantName(dto.restaurantName())
                 .owner(owner)
-                .address(dto.getAddress())
+                .address(dto.address())
                 .build();
 
     }
