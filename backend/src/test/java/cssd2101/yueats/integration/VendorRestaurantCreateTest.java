@@ -1,5 +1,6 @@
 package cssd2101.yueats.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cssd2101.yueats.dto.CustomerSignupRequest;
 import cssd2101.yueats.dto.RestaurantCreationRequest;
 import cssd2101.yueats.dto.VendorSignupRequest;
 import cssd2101.yueats.model.Restaurant;
@@ -14,6 +15,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Objects;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -68,5 +71,29 @@ public class VendorRestaurantCreateTest {
                 .content(objectMapper.writeValueAsString(restaurantDto2))).andExpect(status().isCreated());
 
         assertEquals(2, vendor.getOwnedRestaurants().size());
+    }
+
+    @Test
+    void createRestaurantFail() throws Exception {
+        CustomerSignupRequest dto = new CustomerSignupRequest("notavendor@test.com", "notavendor", "fake", "1234567890", "Password1234!");
+
+        mockMvc.perform(post("/customers/signup").contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(dto))).andExpect(status().isCreated());
+
+        User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new RuntimeException("User not found"));
+
+        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", user.getId(), "123 fake street");
+        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(restaurantDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("User is not a vendor"));
+    }
+
+    @Test
+    void createRestaurantNoUser() throws Exception {
+        RestaurantCreationRequest dto = new RestaurantCreationRequest("five guys", 1, "123 fake street");
+        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))).andExpect(status().isInternalServerError())
+                .andExpect(content().string("User not found"));
     }
 }
