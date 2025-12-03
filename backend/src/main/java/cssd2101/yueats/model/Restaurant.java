@@ -24,7 +24,6 @@ public class Restaurant {
     private Vendor owner;
 
     @Column(nullable = false, unique = true)
-
     private String restaurantName;
 
     @Column(nullable = false)
@@ -32,5 +31,18 @@ public class Restaurant {
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<MenuItem> menuItems = new ArrayList<MenuItem>();
+
+    public List<MenuItem> getMenuItems() {
+        if (menuItems == null) {
+            menuItems = new ArrayList<>();
+        }
+
+        return menuItems;
+    }
+
+    public void addMenuItem(MenuItem menuItem) {
+        menuItems.add(menuItem);
+        menuItem.setRestaurant(this);
+    }
 
 }
