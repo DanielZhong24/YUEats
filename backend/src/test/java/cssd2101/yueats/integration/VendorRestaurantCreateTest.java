@@ -6,6 +6,7 @@ import cssd2101.yueats.dto.VendorSignupRequest;
 import cssd2101.yueats.model.Restaurant;
 import cssd2101.yueats.model.User;
 import cssd2101.yueats.model.Vendor;
+import cssd2101.yueats.repository.RestaurantRepository;
 import cssd2101.yueats.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class VendorRestaurantCreateTest {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RestaurantRepository restaurantRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -95,5 +99,61 @@ public class VendorRestaurantCreateTest {
         mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto))).andExpect(status().isInternalServerError())
                 .andExpect(content().string("User not found"));
+    }
+
+    @Test
+    void createRestaurantValidatorFail() throws Exception {
+        VendorSignupRequest dto = new VendorSignupRequest("vendor@testing.com",
+                "restaurant", "vendor", "1234567890", "Password12345!", "YUEatery");
+
+        mockMvc.perform(post("/vendors/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated());
+
+        User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new RuntimeException("User not found"));
+        Vendor vendor = (Vendor) user;
+        RestaurantCreationRequest dto1 = new RestaurantCreationRequest("", vendor.getId(), "123 fake street");
+
+        mockMvc.perform(post("/restaurants/create")
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto1)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.restaurantName").value("Restaurant name is mandatory"));
+
+        RestaurantCreationRequest dto2 = new RestaurantCreationRequest("testing restaurant", vendor.getId(), "");
+
+        mockMvc.perform(post("/restaurants/create")
+                        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto2)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.address").value("Address is mandatory"));
+
+        assertEquals(0, vendor.getOwnedRestaurants().size());
+    }
+
+    @Test
+    void createDuplicateRestaurant() throws Exception {
+        VendorSignupRequest dto = new VendorSignupRequest("vendor@testing.com",
+                "restaurant", "vendor", "1234567890", "Password12345!", "YUEatery");
+
+        mockMvc.perform(post("/vendors/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated());
+
+        User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new RuntimeException("User not found"));
+        Vendor vendor = (Vendor) user;
+
+        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
+
+        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(restaurantDto))).andExpect(status().isCreated());
+
+        RestaurantCreationRequest dupe = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
+        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dupe)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.restaurantName").value("Restaurant name already exists"));
+
+        assertEquals(1, vendor.getOwnedRestaurants().size());
     }
 }

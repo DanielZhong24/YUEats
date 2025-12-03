@@ -4,6 +4,7 @@ package cssd2101.yueats.controller;
 import cssd2101.yueats.dto.RestaurantCreationRequest;
 import cssd2101.yueats.model.Restaurant;
 import cssd2101.yueats.service.RestaurantService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class RestaurantController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Restaurant> createRestaurant(@RequestBody RestaurantCreationRequest restaurant) {
+    public ResponseEntity<Restaurant> createRestaurant(@Valid @RequestBody RestaurantCreationRequest restaurant) {
         Restaurant rest = restaurantService.createRestaurant(restaurant);
         return new ResponseEntity<>(rest, HttpStatus.CREATED);
     }
