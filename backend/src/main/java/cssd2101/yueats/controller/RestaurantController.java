@@ -7,9 +7,12 @@ import cssd2101.yueats.model.MenuItem;
 import cssd2101.yueats.model.Restaurant;
 import cssd2101.yueats.service.MenuItemService;
 import cssd2101.yueats.service.RestaurantService;
+import cssd2101.yueats.validation.ValidationOrder;
 import jakarta.validation.Valid;
+import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,13 +28,13 @@ public class RestaurantController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Restaurant> createRestaurant(@Valid @RequestBody RestaurantCreationRequest restaurant) {
+    public ResponseEntity<Restaurant> createRestaurant(@Validated({ValidationOrder.class, Default.class}) @RequestBody RestaurantCreationRequest restaurant) {
         Restaurant rest = restaurantService.createRestaurant(restaurant);
         return new ResponseEntity<>(rest, HttpStatus.CREATED);
     }
 
     @PostMapping("/{id}/create-menu")
-    public ResponseEntity<MenuItem> createMenuItem(@Valid @RequestBody MenuItemCreationRequest menuItem, @PathVariable Integer id) {
+    public ResponseEntity<MenuItem> createMenuItem(@Validated({ValidationOrder.class, Default.class}) @RequestBody MenuItemCreationRequest menuItem, @PathVariable Integer id) {
 
         MenuItem item = menuItemService.createMenuItem(menuItem, id);
         return new ResponseEntity<>(item, HttpStatus.CREATED);

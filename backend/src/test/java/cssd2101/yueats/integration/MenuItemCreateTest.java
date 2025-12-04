@@ -21,7 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @Transactional
@@ -79,5 +79,40 @@ public class MenuItemCreateTest {
 
 
         Assertions.assertEquals(1, restaurant.getMenuItems().size());
+    }
+
+    @Test
+    void createMenuItemFail() throws Exception {
+        MenuItemCreationRequest dto = new MenuItemCreationRequest("       ",  "   ", null);
+
+        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.itemName").value("Name is mandatory"))
+                                .andExpect(jsonPath("$.description").value("Description cannot be empty"))
+                                        .andExpect(jsonPath("$.price").value("Price is mandatory"));
+
+
+
+        MenuItemCreationRequest dto2 = new MenuItemCreationRequest("te",  "Simple burger", 4.99);
+
+        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+        .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto2)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.itemName").value("Name must be between 3 and 30 characters"));
+
+        MenuItemCreationRequest dto3 = new MenuItemCreationRequest("",  "", 4.99);
+
+        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto3)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.itemName").value("Name is mandatory"))
+                .andExpect(jsonPath("$.description").value("Description cannot be empty"));
+
+        Assertions.assertEquals(0, restaurant.getMenuItems().size());
+
+
     }
 }
