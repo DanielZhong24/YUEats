@@ -5,7 +5,7 @@ import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
-/*
+
 @Documented
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Constraint(validatedBy = RestaurantUniqueValidator.class)
@@ -15,5 +15,3 @@ public @interface Unique {
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
-
-*/

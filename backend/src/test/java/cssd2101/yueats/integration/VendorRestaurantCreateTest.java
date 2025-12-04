@@ -152,7 +152,8 @@ public class VendorRestaurantCreateTest {
         mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dupe)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.restaurantName").value("Restaurant name already exists"));
+                        .andExpect(content().string("Restaurant already exists"));
+
 
         assertEquals(1, vendor.getOwnedRestaurants().size());
     }

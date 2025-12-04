@@ -30,6 +30,10 @@ public class RestaurantService {
             throw new IllegalArgumentException("User is not a vendor");
         }
 
+        if (restaurantRepository.existsByRestaurantName(req.restaurantName())) {
+            throw new IllegalArgumentException("Restaurant already exists");
+        }
+
         Vendor vendor = (Vendor) user;
         Restaurant restaurant = restaurantBuilder.createRestaurant(req, vendor);
         return restaurantRepository.save(restaurant);

@@ -4,8 +4,9 @@ import cssd2101.yueats.repository.RestaurantRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-/*
+@Component
 public class RestaurantUniqueValidator implements ConstraintValidator<Unique, String> {
 
     @Autowired
@@ -18,7 +19,7 @@ public class RestaurantUniqueValidator implements ConstraintValidator<Unique, St
             return true;
         }
 
-        return !restaurantRepository.existsByName(restaurantName);
+        return !restaurantRepository.existsByRestaurantName(restaurantName);
     }
 }
- */
+
