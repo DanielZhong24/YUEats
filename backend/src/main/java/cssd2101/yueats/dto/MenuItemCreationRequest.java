@@ -11,9 +11,6 @@ public record MenuItemCreationRequest(
         @Size(min = 3, max = 30, message = "Name must be between 3 and 30 characters")
         String itemName,
 
-        @NotNull(message = "Restaurant cannot be empty")
-        Restaurant restaurant,
-
         @NotBlank(message = "Description cannot be empty")
         @Size(max=255, message = "Description must be 255 characters or less")
         String description,

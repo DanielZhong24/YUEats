@@ -23,14 +23,14 @@ public class Restaurant {
     @JoinColumn(name = "owner_id", nullable = false)
     private Vendor owner;
 
-    @Column(nullable = false, unique = true)
+    @Column(name="restaurant_name", nullable = false, unique = true)
     private String restaurantName;
 
     @Column(nullable = false)
     private String address;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    private List<MenuItem> menuItems = new ArrayList<MenuItem>();
+    private List<MenuItem> menuItems = new ArrayList<>();
 
     public List<MenuItem> getMenuItems() {
         if (menuItems == null) {
@@ -41,7 +41,7 @@ public class Restaurant {
     }
 
     public void addMenuItem(MenuItem menuItem) {
-        menuItems.add(menuItem);
+        getMenuItems().add(menuItem);
         menuItem.setRestaurant(this);
     }
 

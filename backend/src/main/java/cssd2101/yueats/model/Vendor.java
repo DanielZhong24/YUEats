@@ -34,7 +34,7 @@ public class Vendor extends User{
     }
 
     public void addRestaurant(Restaurant restaurant) {
-        ownedRestaurants.add(restaurant);
+        getOwnedRestaurants().add(restaurant);
         restaurant.setOwner(this);
     }
 }
