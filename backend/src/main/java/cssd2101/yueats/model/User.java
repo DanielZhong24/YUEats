@@ -31,7 +31,6 @@ public abstract class User {
     private String email;
 
     @Column(nullable=false)
-
     private String passwordHash;
 
     @Column(name="first_name", nullable=false, length=50)
