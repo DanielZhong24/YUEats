@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import cssd2101.yueats.model.MenuItem;
 
 public interface MenuItemRepository extends JpaRepository<MenuItem,Long> {
-
+    boolean existsByRestaurantIdAndItemName(Integer restaurantId, String itemName);
 }

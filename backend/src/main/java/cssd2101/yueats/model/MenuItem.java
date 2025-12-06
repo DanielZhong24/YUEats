@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @Builder
-@Table(name = "menu_items")
+@Table(name = "menu_items", uniqueConstraints = @UniqueConstraint(columnNames = {"restaurant_id", "item_name"}))
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuItem {

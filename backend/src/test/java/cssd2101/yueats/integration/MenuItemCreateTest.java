@@ -112,7 +112,23 @@ public class MenuItemCreateTest {
                 .andExpect(jsonPath("$.description").value("Description cannot be empty"));
 
         Assertions.assertEquals(0, restaurant.getMenuItems().size());
+    }
 
+    @Test
+    void duplicateItem() throws Exception {
+        MenuItemCreationRequest dto = new MenuItemCreationRequest("Burger",  "Simple burger", 4.99);
 
+        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                        .andExpect(content().string("Menu item already exists in this restaurant"));
+
+        Assertions.assertEquals(1, restaurant.getMenuItems().size());
     }
 }

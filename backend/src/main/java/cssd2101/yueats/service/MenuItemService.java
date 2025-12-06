@@ -18,6 +18,11 @@ public class MenuItemService {
     }
 
     public MenuItem createMenuItem(MenuItemCreationRequest req, Integer restaurantId) {
+
+        if (menuItemRepository.existsByRestaurantIdAndItemName(restaurantId, req.itemName())) {
+            throw new IllegalArgumentException("Menu item already exists in this restaurant");
+        }
+
         MenuItem item = restaurantBuilder.createMenuItem(req, restaurantId);
         return menuItemRepository.save(item);
 
