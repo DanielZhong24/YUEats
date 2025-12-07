@@ -53,6 +53,22 @@ public class VendorRestaurantCreateTest {
     }
 
     @Test
+    void createVendorFail() throws Exception {
+        VendorSignupRequest dto = new VendorSignupRequest("vendor@.com", "", "213123", "test123", "wqeqererfaf", "");
+
+        mockMvc.perform(post("/vendors/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.email").value("Invalid email format"))
+                .andExpect(jsonPath("$.firstName").value("First name cannot be blank"))
+                .andExpect(jsonPath("$.lastName").value("Last name cannot contain numbers"))
+                .andExpect(jsonPath("$.phoneNumber").value("Phone number must only contain 10 digits"))
+                .andExpect(jsonPath("$.password").value("Password must be between 8 and 32 characters, contain at least one number, one lowercase letter, one uppercase letter, and one special character"))
+                .andExpect(jsonPath("$.businessName").value("Business name cannot be blank"));
+    }
+
+    @Test
     void createRestaurant() throws Exception {
         VendorSignupRequest dto = new VendorSignupRequest("vendor@testing.com",
                 "restaurant", "vendor", "1234567890", "Password12345!", "YUEatery");
