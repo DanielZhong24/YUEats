@@ -19,6 +19,7 @@ public class SecurityConfig {
     }
 
     // remove this method before production
+    /*
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
@@ -29,6 +30,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+    */
 
     /*
     @Bean

@@ -2,6 +2,10 @@ package cssd2101.yueats.integration;
 
 import cssd2101.yueats.dto.CustomerSignupRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cssd2101.yueats.model.Customer;
+import cssd2101.yueats.model.User;
+import cssd2101.yueats.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(TestConfig.class)
 class CustomerSignupIntegrationTest {
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -58,6 +65,32 @@ class CustomerSignupIntegrationTest {
                 .content(objectMapper.writeValueAsString(dto))).
                 andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.email").value("Invalid email format"));
+    }
+
+    @Test
+    void testCustomerHashing() throws Exception {
+        CustomerSignupRequest dto = new CustomerSignupRequest(
+                "testuser232@example.com",
+                "TestUser",
+                "User",
+                "1234567890",
+                "Password123!"
+        );
+
+        mockMvc.perform(post("/customers/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.email").value("testuser232@example.com"))
+                .andExpect(jsonPath("$.userRole").value("CUSTOMER"))
+                .andExpect(jsonPath("$.id").exists());
+
+        User user = userRepository.findByEmail("testuser232@example.com").orElseThrow();
+        Customer customer = (Customer) user;
+
+
+        Assertions.assertNotEquals("Password123!", customer.getPasswordHash());
+
     }
 
 

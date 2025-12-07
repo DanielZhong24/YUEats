@@ -52,6 +52,11 @@ public class VendorRestaurantCreateTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
+
+        User user = userRepository.findByEmail("vendor@vending.com").orElseThrow();
+        Vendor vendor = (Vendor) user;
+
+        assertNotEquals("Password123!", vendor.getPasswordHash());
     }
 
     @Test
