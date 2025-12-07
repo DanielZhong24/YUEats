@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserFactory {
-    public Customer createCustomer(CustomerSignupRequest dto) {
+    public Customer createCustomer(CustomerSignupRequest dto, String hashedPassword) {
         return Customer.builder()
                 .email(dto.email())
-                .passwordHash(dto.password())
+                .passwordHash(hashedPassword)
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
                 .phoneNumber(dto.phoneNumber())
@@ -20,10 +20,10 @@ public class UserFactory {
                 .isVerified(false).build();
 
     }
-    public Vendor createVendor(VendorSignupRequest dto) {
+    public Vendor createVendor(VendorSignupRequest dto, String hashedPassword) {
         return Vendor.builder()
                 .email(dto.email())
-                .passwordHash(dto.password())
+                .passwordHash(hashedPassword)
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
                 .phoneNumber(dto.phoneNumber())

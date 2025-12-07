@@ -6,16 +6,19 @@ import cssd2101.yueats.factory.UserFactory;
 import cssd2101.yueats.model.Customer;
 import cssd2101.yueats.model.Vendor;
 import cssd2101.yueats.repository.UserRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final UserFactory userFactory;
+    private final BCryptPasswordEncoder encoder;
 
-    public UserService(UserRepository userRepository, UserFactory userFactory) {
+    public UserService(UserRepository userRepository, UserFactory userFactory, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder hashConfig) {
         this.userRepository = userRepository;
         this.userFactory = userFactory;
+        this.encoder = bCryptPasswordEncoder;
     }
 
     public Customer registerCustomer(CustomerSignupRequest dto){
@@ -23,7 +26,11 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        return userRepository.save(userFactory.createCustomer(dto));
+        String hashed = encoder.encode(dto.password());
+        Customer customer = userFactory.createCustomer(dto, hashed);
+
+
+        return userRepository.save(customer);
     }
 
     public Vendor registerVendor(VendorSignupRequest dto){
@@ -31,7 +38,10 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        return userRepository.save(userFactory.createVendor(dto));
+        String hashed = encoder.encode(dto.password());
+        Vendor vendor = userFactory.createVendor(dto, hashed);
+
+        return userRepository.save(vendor);
     }
 
 }

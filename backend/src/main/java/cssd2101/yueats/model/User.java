@@ -47,5 +47,5 @@ public abstract class User {
     private UserRole userRole;
 
     @Column(name="is_verified")
-    private boolean isVerified=false;
+    private Boolean isVerified=false;
 }

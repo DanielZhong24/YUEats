@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
+@Import(TestConfig.class)
 public class VendorRestaurantCreateTest {
     @Autowired
     private UserRepository userRepository;
@@ -111,7 +113,7 @@ public class VendorRestaurantCreateTest {
 
     @Test
     void createRestaurantNoUser() throws Exception {
-        RestaurantCreationRequest dto = new RestaurantCreationRequest("five guys", 1, "123 fake street");
+        RestaurantCreationRequest dto = new RestaurantCreationRequest("five guys", 4, "123 fake street");
         mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto))).andExpect(status().isInternalServerError())
                 .andExpect(content().string("User not found"));
