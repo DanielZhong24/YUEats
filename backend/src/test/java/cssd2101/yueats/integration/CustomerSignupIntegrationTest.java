@@ -42,7 +42,7 @@ class CustomerSignupIntegrationTest {
                 "Password123!"
         );
 
-        mockMvc.perform(post("/customers/signup")
+        mockMvc.perform(post("/customers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -61,7 +61,7 @@ class CustomerSignupIntegrationTest {
                 "Password123!"
         );
 
-        mockMvc.perform(post("/customers/signup").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto))).
                 andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.email").value("Invalid email format"));
@@ -77,7 +77,7 @@ class CustomerSignupIntegrationTest {
                 "Password123!"
         );
 
-        mockMvc.perform(post("/customers/signup")
+        mockMvc.perform(post("/customers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -104,7 +104,7 @@ class CustomerSignupIntegrationTest {
                 "Password123!"
         );
 
-        mockMvc.perform(post("/customers/signup").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.firstName").value("First name cannot contain numbers"))
@@ -121,7 +121,7 @@ class CustomerSignupIntegrationTest {
                 "Password123!"
         );
 
-        mockMvc.perform(post("/customers/signup").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.phoneNumber").value("Phone number must only contain 10 digits"));
@@ -137,7 +137,7 @@ class CustomerSignupIntegrationTest {
                 "password123"
         );
 
-        mockMvc.perform(post("/customers/signup").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.password")
@@ -156,7 +156,7 @@ class CustomerSignupIntegrationTest {
                 "test123"
         );
 
-        mockMvc.perform(post("/customers/signup").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.password")
@@ -177,7 +177,7 @@ class CustomerSignupIntegrationTest {
 
         );
 
-        mockMvc.perform(post("/customers/signup").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.email").value("Email is mandatory"))

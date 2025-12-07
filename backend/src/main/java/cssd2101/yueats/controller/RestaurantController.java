@@ -27,13 +27,13 @@ public class RestaurantController {
         this.menuItemService = menuItemService;
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<Restaurant> createRestaurant(@Validated({ValidationOrder.class, Default.class}) @RequestBody RestaurantCreationRequest restaurant) {
         Restaurant rest = restaurantService.createRestaurant(restaurant);
         return new ResponseEntity<>(rest, HttpStatus.CREATED);
     }
 
-    @PostMapping("/{id}/create-menu")
+    @PostMapping("/{id}/menu-item")
     public ResponseEntity<MenuItem> createMenuItem(@Validated({ValidationOrder.class, Default.class}) @RequestBody MenuItemCreationRequest menuItem, @PathVariable Integer id) {
 
         MenuItem item = menuItemService.createMenuItem(menuItem, id);

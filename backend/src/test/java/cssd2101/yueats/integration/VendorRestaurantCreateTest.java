@@ -48,7 +48,7 @@ public class VendorRestaurantCreateTest {
         VendorSignupRequest dto = new VendorSignupRequest("vendor@vending.com",
                 "vendor", "tester", "1234567890", "Password123!", "YUEats");
 
-        mockMvc.perform(post("/vendors/signup")
+        mockMvc.perform(post("/vendors")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
@@ -63,7 +63,7 @@ public class VendorRestaurantCreateTest {
     void createVendorFail() throws Exception {
         VendorSignupRequest dto = new VendorSignupRequest("vendor@.com", "", "213123", "test123", "wqeqererfaf", "");
 
-        mockMvc.perform(post("/vendors/signup")
+        mockMvc.perform(post("/vendors")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
@@ -80,7 +80,7 @@ public class VendorRestaurantCreateTest {
         VendorSignupRequest dto = new VendorSignupRequest("vendor@testing.com",
                 "restaurant", "vendor", "1234567890", "Password12345!", "YUEatery");
 
-        mockMvc.perform(post("/vendors/signup")
+        mockMvc.perform(post("/vendors")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
@@ -90,11 +90,11 @@ public class VendorRestaurantCreateTest {
 
         RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
 
-        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restaurantDto))).andExpect(status().isCreated());
 
         RestaurantCreationRequest restaurantDto2 = new RestaurantCreationRequest("popeyes", vendor.getId(), "345 down street");
-        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restaurantDto2))).andExpect(status().isCreated());
 
         assertEquals(2, vendor.getOwnedRestaurants().size());
@@ -104,13 +104,13 @@ public class VendorRestaurantCreateTest {
     void createRestaurantFail() throws Exception {
         CustomerSignupRequest dto = new CustomerSignupRequest("notavendor@test.com", "notavendor", "fake", "1234567890", "Password1234!");
 
-        mockMvc.perform(post("/customers/signup").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(dto))).andExpect(status().isCreated());
 
         User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new RuntimeException("User not found"));
 
         RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", user.getId(), "123 fake street");
-        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(restaurantDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("User is not a vendor"));
@@ -119,8 +119,9 @@ public class VendorRestaurantCreateTest {
     @Test
     void createRestaurantNoUser() throws Exception {
         RestaurantCreationRequest dto = new RestaurantCreationRequest("five guys", 4, "123 fake street");
-        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto))).andExpect(status().isInternalServerError())
+                .andDo(print())
                 .andExpect(content().string("User not found"));
     }
 
@@ -129,7 +130,7 @@ public class VendorRestaurantCreateTest {
         VendorSignupRequest dto = new VendorSignupRequest("vendor@testing.com",
                 "restaurant", "vendor", "1234567890", "Password12345!", "YUEatery");
 
-        mockMvc.perform(post("/vendors/signup")
+        mockMvc.perform(post("/vendors")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
@@ -138,14 +139,14 @@ public class VendorRestaurantCreateTest {
         Vendor vendor = (Vendor) user;
         RestaurantCreationRequest dto1 = new RestaurantCreationRequest("", vendor.getId(), "123 fake street");
 
-        mockMvc.perform(post("/restaurants/create")
+        mockMvc.perform(post("/restaurants")
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto1)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.restaurantName").value("Restaurant name is mandatory"));
 
         RestaurantCreationRequest dto2 = new RestaurantCreationRequest("testing restaurant", vendor.getId(), "");
 
-        mockMvc.perform(post("/restaurants/create")
+        mockMvc.perform(post("/restaurants")
                         .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto2)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.address").value("Address is mandatory"));
@@ -158,7 +159,7 @@ public class VendorRestaurantCreateTest {
         VendorSignupRequest dto = new VendorSignupRequest("vendor@testing.com",
                 "restaurant", "vendor", "1234567890", "Password12345!", "YUEatery");
 
-        mockMvc.perform(post("/vendors/signup")
+        mockMvc.perform(post("/vendors")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
@@ -168,11 +169,11 @@ public class VendorRestaurantCreateTest {
 
         RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
 
-        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restaurantDto))).andExpect(status().isCreated());
 
         RestaurantCreationRequest dupe = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
-        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dupe)))
                 .andExpect(status().isBadRequest())
                         .andExpect(content().string("Restaurant already exists"));

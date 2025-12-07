@@ -20,7 +20,7 @@ public class CustomerController {
         this.userService = userService;
     }
 
-    @PostMapping("signup")
+    @PostMapping
     public ResponseEntity<Customer> signup(@Valid @RequestBody CustomerSignupRequest dto){
         Customer customer = userService.registerCustomer(dto);
         return new ResponseEntity<>(customer, HttpStatus.CREATED);

@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("vendors")
+@RequestMapping("/vendors")
 public class VendorController {
     private final UserService userService;
 
@@ -19,7 +19,7 @@ public class VendorController {
         this.userService = userService;
     }
 
-    @PostMapping("/signup")
+    @PostMapping()
     public ResponseEntity<Vendor> signup(@Validated({ValidationOrder.class, Default.class}) @RequestBody VendorSignupRequest dto){
         Vendor vendor = userService.registerVendor(dto);
         return new ResponseEntity<>(vendor, HttpStatus.CREATED);

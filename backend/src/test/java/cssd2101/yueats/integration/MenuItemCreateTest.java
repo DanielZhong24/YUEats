@@ -54,7 +54,7 @@ public class MenuItemCreateTest {
         VendorSignupRequest dto = new VendorSignupRequest("vendor@testing.com",
                 "restaurant", "vendor", "1234567890", "Password12345!", "YUEatery");
 
-        mockMvc.perform(post("/vendors/signup")
+        mockMvc.perform(post("/vendors")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
@@ -64,7 +64,7 @@ public class MenuItemCreateTest {
 
         RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
 
-        mockMvc.perform(post("/restaurants/create").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restaurantDto))).andExpect(status().isCreated());
 
         restaurant = restaurantRepository.findByRestaurantName("five guys").orElseThrow(() -> new RuntimeException("Restaurant not found"));
@@ -74,7 +74,7 @@ public class MenuItemCreateTest {
     void createMenuItem() throws Exception {
         MenuItemCreationRequest dto = new MenuItemCreationRequest("Burger",  "Simple burger", 4.99);
 
-        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+        mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
@@ -87,7 +87,7 @@ public class MenuItemCreateTest {
     void createMenuItemFail() throws Exception {
         MenuItemCreationRequest dto = new MenuItemCreationRequest("       ",  "   ", null);
 
-        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+        mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())
                         .andExpect(jsonPath("$.itemName").value("Name is mandatory"))
@@ -98,7 +98,7 @@ public class MenuItemCreateTest {
 
         MenuItemCreationRequest dto2 = new MenuItemCreationRequest("te",  "Simple burger", 4.99);
 
-        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+        mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
         .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto2)))
                 .andExpect(status().isBadRequest())
@@ -106,7 +106,7 @@ public class MenuItemCreateTest {
 
         MenuItemCreationRequest dto3 = new MenuItemCreationRequest("",  "", 4.99);
 
-        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+        mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto3)))
                 .andExpect(status().isBadRequest())
@@ -120,12 +120,12 @@ public class MenuItemCreateTest {
     void duplicateItem() throws Exception {
         MenuItemCreationRequest dto = new MenuItemCreationRequest("Burger",  "Simple burger", 4.99);
 
-        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+        mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(post("/restaurants/{id}/create-menu", restaurant.getId())
+        mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
