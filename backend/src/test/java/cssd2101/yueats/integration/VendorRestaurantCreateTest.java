@@ -3,7 +3,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cssd2101.yueats.dto.CustomerSignupRequest;
 import cssd2101.yueats.dto.RestaurantCreationRequest;
 import cssd2101.yueats.dto.VendorSignupRequest;
-import cssd2101.yueats.model.Restaurant;
 import cssd2101.yueats.model.User;
 import cssd2101.yueats.model.Vendor;
 import cssd2101.yueats.repository.RestaurantRepository;
@@ -18,7 +17,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Objects;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -120,7 +118,7 @@ public class VendorRestaurantCreateTest {
     void createRestaurantNoUser() throws Exception {
         RestaurantCreationRequest dto = new RestaurantCreationRequest("five guys", 4, "123 fake street");
         mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto))).andExpect(status().isInternalServerError())
+                .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())
                 .andDo(print())
                 .andExpect(content().string("User not found"));
     }
