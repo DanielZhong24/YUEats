@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 @Builder
@@ -29,5 +31,5 @@ public class MenuItem {
     private String description;
 
     @Column(name = "price")
-    private Double price;
+    private BigDecimal price;
 }
