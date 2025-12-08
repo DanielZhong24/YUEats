@@ -1,5 +1,6 @@
 package cssd2101.yueats.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -21,6 +22,7 @@ public class Restaurant {
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
+    @JsonIgnore
     private Vendor owner;
 
     @Column(name="restaurant_name", nullable = false, unique = true)
@@ -30,6 +32,7 @@ public class Restaurant {
     private String address;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<MenuItem> menuItems = new ArrayList<>();
 
     public List<MenuItem> getMenuItems() {
