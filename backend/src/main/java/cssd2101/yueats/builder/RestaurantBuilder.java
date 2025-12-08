@@ -8,6 +8,8 @@ import cssd2101.yueats.model.Vendor;
 import org.springframework.stereotype.Component;
 import cssd2101.yueats.repository.RestaurantRepository;
 
+import java.math.BigDecimal;
+
 
 @Component
 public class RestaurantBuilder {
@@ -35,7 +37,7 @@ public class RestaurantBuilder {
 
         MenuItem menuItem =  MenuItem.builder()
                 .itemName(dto.itemName())
-                .price(dto.price())
+                .price(BigDecimal.valueOf(dto.price()))
                 .description(dto.description())
                 .restaurant(restaurant)
                 .build();
