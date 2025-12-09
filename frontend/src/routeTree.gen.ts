@@ -9,11 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VendorRouteRouteImport } from './routes/vendor/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VendorIndexRouteImport } from './routes/vendor/index'
 import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as VendorSignupIndexRouteImport } from './routes/vendor/signup/index'
+import { Route as VendorLoginIndexRouteImport } from './routes/vendor/login/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
@@ -25,20 +26,15 @@ import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
 
-const VendorRouteRoute = VendorRouteRouteImport.update({
-  id: '/vendor',
-  path: '/vendor',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VendorIndexRoute = VendorIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => VendorRouteRoute,
+  id: '/vendor/',
+  path: '/vendor/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DemoIndexRoute = DemoIndexRouteImport.update({
   id: '/demo/',
@@ -48,6 +44,16 @@ const DemoIndexRoute = DemoIndexRouteImport.update({
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VendorSignupIndexRoute = VendorSignupIndexRouteImport.update({
+  id: '/vendor/signup/',
+  path: '/vendor/signup/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VendorLoginIndexRoute = VendorLoginIndexRouteImport.update({
+  id: '/vendor/login/',
+  path: '/vendor/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -103,16 +109,17 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/vendor': typeof VendorRouteRouteWithChildren
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo': typeof DemoIndexRoute
-  '/vendor/': typeof VendorIndexRoute
+  '/vendor': typeof VendorIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/vendor/login': typeof VendorLoginIndexRoute
+  '/vendor/signup': typeof VendorSignupIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -129,6 +136,8 @@ export interface FileRoutesByTo {
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/vendor/login': typeof VendorLoginIndexRoute
+  '/vendor/signup': typeof VendorSignupIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -137,7 +146,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/vendor': typeof VendorRouteRouteWithChildren
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/': typeof DemoIndexRoute
   '/vendor/': typeof VendorIndexRoute
@@ -147,6 +155,8 @@ export interface FileRoutesById {
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/vendor/login/': typeof VendorLoginIndexRoute
+  '/vendor/signup/': typeof VendorSignupIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -156,16 +166,17 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/vendor'
     | '/demo/tanstack-query'
     | '/demo'
-    | '/vendor/'
+    | '/vendor'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/vendor/login'
+    | '/vendor/signup'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -182,6 +193,8 @@ export interface FileRouteTypes {
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/vendor/login'
+    | '/vendor/signup'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -189,7 +202,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/vendor'
     | '/demo/tanstack-query'
     | '/demo/'
     | '/vendor/'
@@ -199,6 +211,8 @@ export interface FileRouteTypes {
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/vendor/login/'
+    | '/vendor/signup/'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -207,15 +221,17 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  VendorRouteRoute: typeof VendorRouteRouteWithChildren
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoIndexRoute: typeof DemoIndexRoute
+  VendorIndexRoute: typeof VendorIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
   DemoFormSimpleRoute: typeof DemoFormSimpleRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  VendorLoginIndexRoute: typeof VendorLoginIndexRoute
+  VendorSignupIndexRoute: typeof VendorSignupIndexRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
@@ -224,13 +240,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vendor': {
-      id: '/vendor'
-      path: '/vendor'
-      fullPath: '/vendor'
-      preLoaderRoute: typeof VendorRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -240,10 +249,10 @@ declare module '@tanstack/react-router' {
     }
     '/vendor/': {
       id: '/vendor/'
-      path: '/'
-      fullPath: '/vendor/'
+      path: '/vendor'
+      fullPath: '/vendor'
       preLoaderRoute: typeof VendorIndexRouteImport
-      parentRoute: typeof VendorRouteRoute
+      parentRoute: typeof rootRouteImport
     }
     '/demo/': {
       id: '/demo/'
@@ -257,6 +266,20 @@ declare module '@tanstack/react-router' {
       path: '/demo/tanstack-query'
       fullPath: '/demo/tanstack-query'
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vendor/signup/': {
+      id: '/vendor/signup/'
+      path: '/vendor/signup'
+      fullPath: '/vendor/signup'
+      preLoaderRoute: typeof VendorSignupIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vendor/login/': {
+      id: '/vendor/login/'
+      path: '/vendor/login'
+      fullPath: '/vendor/login'
+      preLoaderRoute: typeof VendorLoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -332,29 +355,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface VendorRouteRouteChildren {
-  VendorIndexRoute: typeof VendorIndexRoute
-}
-
-const VendorRouteRouteChildren: VendorRouteRouteChildren = {
-  VendorIndexRoute: VendorIndexRoute,
-}
-
-const VendorRouteRouteWithChildren = VendorRouteRoute._addFileChildren(
-  VendorRouteRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  VendorRouteRoute: VendorRouteRouteWithChildren,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoIndexRoute: DemoIndexRoute,
+  VendorIndexRoute: VendorIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  VendorLoginIndexRoute: VendorLoginIndexRoute,
+  VendorSignupIndexRoute: VendorSignupIndexRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,

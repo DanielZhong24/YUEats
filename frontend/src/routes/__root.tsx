@@ -13,7 +13,9 @@ import appCss from '../styles.css?url'
 import type { QueryClient } from '@tanstack/react-query'
 
 import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from '@/components/ui/sonner'
 import { themeScript } from '@/lib/theme-script'
+import { ThemeModeToggle } from '@/components/theme-mode-toggle'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -53,7 +55,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ThemeProvider defaultTheme="dark" storageKey="yueats-theme">
+          <Toaster />
           {children}
+          <div className="absolute bottom-0 left-0 p-3">
+            <ThemeModeToggle />
+          </div>
         </ThemeProvider>
         <TanStackDevtools
           config={{

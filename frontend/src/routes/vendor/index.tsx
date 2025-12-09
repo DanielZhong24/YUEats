@@ -1,15 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/vendor/')({
-  component: VendorHome,
+  component: VendorLayout,
 })
 
-// TODO: Implement vendor user flow
-function VendorHome() {
+function VendorLayout() {
   return (
     <div>
-      <div>Hello "/vendor/"!</div>
-      <div>testing</div>
+      <div>Should be home page of Vendor</div>
+      <div>If !user, go to signup automatically</div>
     </div>
   )
 }
