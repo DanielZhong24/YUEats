@@ -40,9 +40,9 @@ VALUES (1, 1, CURRENT_TIMESTAMP, 'PENDING', 14.49, 'Alice Home Address, Apt 4B')
 
 -- The Order Details (Items)
 -- 1x Cheeseburger ($9.99)
-INSERT INTO order_details (order_id, menu_item_id, quantity, price, total_price)
+INSERT INTO order_details (order_id, menu_item_id, quantity, price, price_at_purchase)
 VALUES (1, 1, 1, 9.99, 9.99);
 
 -- 1x Fries ($4.50)
-INSERT INTO order_details (order_id, menu_item_id, quantity, price, total_price)
+INSERT INTO order_details (order_id, menu_item_id, quantity, price, price_at_purchase)
 VALUES (1, 3, 1, 4.50, 4.50);
