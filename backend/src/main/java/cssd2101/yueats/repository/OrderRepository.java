@@ -1,6 +1,7 @@
 package cssd2101.yueats.repository;
 
 import cssd2101.yueats.model.Order;
+import cssd2101.yueats.types.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +17,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByRestaurantId(Integer restaurantId);
 
     // Find by Status (e.g., show me all "PENDING" orders)
-    List<Order> findByRestaurantIdAndStatus(Integer restaurantId, String status);
+    List<Order> findByRestaurantIdAndStatus(Integer restaurantId, OrderStatus status);
 }

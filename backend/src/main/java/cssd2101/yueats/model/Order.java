@@ -32,12 +32,22 @@ public class Order{
 
     private LocalDateTime orderDate;
 
+    private LocalDateTime lastUpdated;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     private BigDecimal totalPrice;
 
     private String deliveryAddress;
+
+    @ManyToOne
+    @JoinColumn(name = "driver_id")
+    private DeliveryDriver driver;
+
+    @Column(length = 10)
+    private String pickupCode;
+
 
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference
