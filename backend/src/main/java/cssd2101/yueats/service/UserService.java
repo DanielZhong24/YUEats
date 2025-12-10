@@ -4,6 +4,7 @@ import cssd2101.yueats.dto.CustomerSignupRequest;
 import cssd2101.yueats.dto.VendorSignupRequest;
 import cssd2101.yueats.factory.UserFactory;
 import cssd2101.yueats.model.Customer;
+import cssd2101.yueats.model.DeliveryDriver;
 import cssd2101.yueats.model.Vendor;
 import cssd2101.yueats.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -42,6 +43,17 @@ public class UserService {
         Vendor vendor = userFactory.createVendor(dto, hashed);
 
         return userRepository.save(vendor);
+    }
+
+    public DeliveryDriver registerDriver(CustomerSignupRequest dto){
+        if (userRepository.existsByEmail(dto.email())){
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        String hashed = encoder.encode(dto.password());
+        DeliveryDriver driver = userFactory.createDriver(dto, hashed);
+
+        return userRepository.save(driver);
     }
 
 }

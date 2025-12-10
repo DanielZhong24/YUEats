@@ -1,5 +1,6 @@
 package cssd2101.yueats.model;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
+@DiscriminatorValue("COURIER")
 @NoArgsConstructor
-@AllArgsConstructor
 public class DeliveryDriver extends User {
 }
