@@ -3,6 +3,7 @@ package cssd2101.yueats.factory;
 import cssd2101.yueats.dto.CustomerSignupRequest;
 import cssd2101.yueats.dto.VendorSignupRequest;
 import cssd2101.yueats.model.Customer;
+import cssd2101.yueats.model.DeliveryDriver;
 import cssd2101.yueats.model.Vendor;
 import cssd2101.yueats.types.UserRole;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,18 @@ public class UserFactory {
                 .isVerified(false)
                 .businessName(dto.businessName()).build();
 
+    }
+
+    // Delivery driver sign up process data seems mostly the same as customer
+    public DeliveryDriver createDriver(CustomerSignupRequest dto, String hashedPassword) {
+        return DeliveryDriver.builder()
+                .email(dto.email())
+                .passwordHash(hashedPassword)
+                .firstName(dto.firstName())
+                .lastName(dto.lastName())
+                .phoneNumber(dto.phoneNumber())
+                .userRole(UserRole.COURIER)
+                .isVerified(false).build();
     }
 
 
