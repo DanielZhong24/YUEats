@@ -6,6 +6,7 @@ import cssd2101.yueats.types.OrderStatus;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -31,6 +32,7 @@ public class OrderStateMachine {
         if (nextStatus == null) return;
 
         order.setStatus(nextStatus);
+        order.setLastUpdated(LocalDateTime.now());
         if (nextStatus == OrderStatus.READY_FOR_PICKUP) {
             order.setPickupCode(UUID.randomUUID().toString().substring(0,6));
         }
