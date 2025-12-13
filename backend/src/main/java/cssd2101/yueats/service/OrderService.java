@@ -99,7 +99,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void claimOrder(Integer orderId, String email) {
+    public Order claimOrder(Integer orderId, String email) {
         Order order = orderRepository.findById(Long.valueOf(orderId)).orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
         if (order.getStatus() != OrderStatus.READY_FOR_PICKUP) {
@@ -115,5 +115,6 @@ public class OrderService {
         order.setLastUpdated(LocalDateTime.now());
 
         orderRepository.save(order);
+        return order;
     }
 }

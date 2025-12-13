@@ -8,6 +8,8 @@ import cssd2101.yueats.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,8 +38,15 @@ public class DriverController {
     }
 
     @PostMapping("/orders/{id}/claim")
-    public ResponseEntity<Order> claimOrder(@PathVariable("id") long id) {
+    public ResponseEntity<String> claimOrder(@PathVariable("id") Integer id, @AuthenticationPrincipal UserDetails userDetails) {
+        Order order = orderService.claimOrder(id, userDetails.getUsername());
+        return new ResponseEntity<>(order.getPickupCode(), HttpStatus.ACCEPTED);
+    }
 
+    @PostMapping("/orders/{id}/pickup")
+    public ResponseEntity<Order> pickupOrder(@PathVariable("id") Integer id, @RequestBody String code, @AuthenticationPrincipal UserDetails userDetails) {
+        orderService.verifyPickup(id, code, userDetails.getUsername());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
 }

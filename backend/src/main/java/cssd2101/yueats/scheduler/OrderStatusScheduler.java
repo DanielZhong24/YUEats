@@ -5,6 +5,9 @@ import cssd2101.yueats.repository.OrderRepository;
 import cssd2101.yueats.types.OrderStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,6 +28,16 @@ public class OrderStatusScheduler {
 
         for (Order order : orders) {
             statusMachine.updateOrderStatus(order);
+        }
+    }
+
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    private void autoDeliver() {
+        List<Order> inTransit = orderRepository.findByStatus(OrderStatus.IN_TRANSIT);
+
+        for (Order order : inTransit) {
+            statusMachine.updateTransit(order);
         }
     }
 }

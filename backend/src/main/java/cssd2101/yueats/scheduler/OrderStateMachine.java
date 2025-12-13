@@ -40,4 +40,12 @@ public class OrderStateMachine {
         orderRepository.save(order);
         applicationEventPublisher.publishEvent(new OrderStatusEvent(order.getId(), nextStatus));
     }
+
+    public void updateTransit(Order order) {
+        order.setStatus(OrderStatus.DELIVERED);
+        order.setLastUpdated(LocalDateTime.now());
+
+        orderRepository.save(order);
+        applicationEventPublisher.publishEvent(new OrderStatusEvent(order.getId(), OrderStatus.DELIVERED));
+    }
 }
