@@ -11,6 +11,13 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -28,13 +35,16 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-    /*
+
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+        http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**","/vendors",
+                "/customers",
+                "/users",
+                "/login"))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/customers/signup", "/vendors/signup", "/h2-console/**", "/login")
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/customers", "/vendors","/users", "/h2-console/**", "/login")
                         .permitAll()
                         .requestMatchers("/vendors/**").hasRole("VENDOR")
                         .requestMatchers("/customers/**").hasRole("CUSTOMER")
@@ -45,7 +55,7 @@ public class SecurityConfig {
 
         return http.build();
     }
-    */
+
 
 
     @Bean
@@ -55,4 +65,16 @@ public class SecurityConfig {
         return provider;
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }
