@@ -100,25 +100,58 @@ export function VendorSignupForm() {
     onSubmit: async ({ value }) => {
       const { passwordConfirm, ...sanitized } = value
       sanitized.phoneNumber = sanitized.phoneNumber?.replace(/[-\s]/g, '')
-
+      const phoneNumberSanitized = sanitized.phoneNumber;
       // TODO: Connect to backend API to create vendor account
+        const payload = {
+          ...sanitized, phoneNumberSanitized
+        }
+        try{
+            const response = await fetch("http://localhost:8080/vendors",{
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
 
-      toast('You submitted the following values:', {
-        description: (
-          <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
-            <code>{JSON.stringify(sanitized, null, 2)}</code>
-          </pre>
-        ),
-        position: 'bottom-right',
-        classNames: {
-          content: 'flex flex-col gap-2',
-        },
-        style: {
-          '--border-radius': 'calc(var(--radius)  + 4px)',
-        } as React.CSSProperties,
-      })
+            if(response.ok){
+                toast.success('Account Created Successfully!', {
+                    description: 'You can now log in to your vendor account.',})
+                form.reset()
+            }else{
+                const error = await response.json()
+                const message = error.message ||'unknown error'
+                toast.error('signup failed!',{
+                    description: message,
+                })
+            }
+        }catch(error){
+            console.log(error)
+            toast.error('network error!', {
+                description: 'could not connect to the server',
+            })
+        }
+
+
+      // toast('You submitted the following values:', {
+      //   description: (
+      //     <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
+      //       <code>{JSON.stringify(sanitized, null, 2)}</code>
+      //     </pre>
+      //   ),
+      //   position: 'bottom-right',
+      //   classNames: {
+      //     content: 'flex flex-col gap-2',
+      //   },
+      //   style: {
+      //     '--border-radius': 'calc(var(--radius)  + 4px)',
+      //   } as React.CSSProperties,
+      // })
     },
   })
+
+
+    const isSubmitting = form.state.isSubmitting;
 
   return (
     <Card className="w-full sm:max-w-md">
@@ -341,9 +374,13 @@ export function VendorSignupForm() {
                 type="submit"
                 form="vendor-signup-form"
                 className="w-full"
+                disabled={isSubmitting}
               >
-                Create Vendor Account
-              </Button>
+                  {isSubmitting ? (
+                      'Creating...'
+                  ) : (
+                      'Create Vendor Account'
+                  )}              </Button>
             </Field>
             <FieldDescription className="text-center ">
               Already have an account?
