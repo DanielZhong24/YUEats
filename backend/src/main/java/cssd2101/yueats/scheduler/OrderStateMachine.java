@@ -14,7 +14,7 @@ import java.util.UUID;
 public class OrderStateMachine {
     private static final Map<OrderStatus, OrderStatus> orderStatusMap = Map.of(
             OrderStatus.PENDING, OrderStatus.PREPARING,
-            OrderStatus.READY_FOR_PICKUP, OrderStatus.DELIVERED);
+            OrderStatus.PREPARING, OrderStatus.READY_FOR_PICKUP);
 
     private final OrderRepository orderRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -38,8 +38,6 @@ public class OrderStateMachine {
         }
 
         orderRepository.save(order);
-
-        order.setStatus(nextStatus);
         applicationEventPublisher.publishEvent(new OrderStatusEvent(order.getId(), nextStatus));
     }
 }

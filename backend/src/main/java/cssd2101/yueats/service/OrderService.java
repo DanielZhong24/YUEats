@@ -73,4 +73,47 @@ public class OrderService {
 
         return orderRepository.save(order);
     }
+
+    public void verifyPickup(Integer orderId, String code, String email) {
+        Order order = orderRepository.findById(Long.valueOf(orderId)).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        if (order.getStatus() != OrderStatus.PICKED_UP) {
+            throw new IllegalStateException("Order was not chosen by the delivery driver");
+        }
+
+        if (!order.getPickupCode().equals(code)) {
+            throw new  IllegalStateException("Order code is incorrect");
+        }
+
+        if (!order.getDriver().getEmail().equals(email)) {
+            throw new  IllegalStateException("This order is not assigned to you");
+        }
+
+        order.setStatus(OrderStatus.IN_TRANSIT);
+        order.setLastUpdated(LocalDateTime.now());
+        orderRepository.save(order);
+    }
+
+    public List<Order> getReadyOrders() {
+        return orderRepository.findByStatus(OrderStatus.READY_FOR_PICKUP);
+    }
+
+    @Transactional
+    public void claimOrder(Integer orderId, String email) {
+        Order order = orderRepository.findById(Long.valueOf(orderId)).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        if (order.getStatus() != OrderStatus.READY_FOR_PICKUP) {
+            throw new IllegalStateException("Order status is not ready yet");
+        }
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        DeliveryDriver driver = (DeliveryDriver) user;
+
+        order.setDriver(driver);
+        order.setStatus(OrderStatus.PICKED_UP);
+        order.setLastUpdated(LocalDateTime.now());
+
+        orderRepository.save(order);
+    }
 }

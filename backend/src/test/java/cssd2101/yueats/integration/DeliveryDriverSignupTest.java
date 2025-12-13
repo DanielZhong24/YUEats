@@ -38,7 +38,7 @@ public class DeliveryDriverSignupTest {
         CustomerSignupRequest dto = new CustomerSignupRequest("delivery@deliv.com", "Delivery", "guy",
                 "1234567890", "Password123!");
 
-        mockMvc.perform(post("/delivery").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/drivers").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
 
@@ -53,7 +53,7 @@ public class DeliveryDriverSignupTest {
     void testDeliveryDriverFail() throws Exception{
         CustomerSignupRequest dto = new CustomerSignupRequest("deliv.com", "", "", "12343", "234rsd");
 
-        mockMvc.perform(post("/delivery").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/drivers").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.email").value("Invalid email format"))
