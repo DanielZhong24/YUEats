@@ -32,7 +32,6 @@ public class OrderStatusScheduler {
     }
 
     @Scheduled(fixedRate = 60000)
-    @Transactional
     private void autoDeliver() {
         List<Order> inTransit = orderRepository.findByStatus(OrderStatus.IN_TRANSIT);
 
