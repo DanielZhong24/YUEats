@@ -1,6 +1,7 @@
 package cssd2101.yueats.controller;
 
 import cssd2101.yueats.dto.CustomerSignupRequest;
+import cssd2101.yueats.dto.PickupCodeRequest;
 import cssd2101.yueats.model.DeliveryDriver;
 import cssd2101.yueats.model.Order;
 import cssd2101.yueats.service.OrderService;
@@ -44,8 +45,8 @@ public class DriverController {
     }
 
     @PostMapping("/orders/{id}/pickup")
-    public ResponseEntity<Order> pickupOrder(@PathVariable("id") Integer id, @RequestBody String code, @AuthenticationPrincipal UserDetails userDetails) {
-        orderService.verifyPickup(id, code, userDetails.getUsername());
+    public ResponseEntity<Order> pickupOrder(@PathVariable("id") Integer id, @RequestBody @Valid PickupCodeRequest req, @AuthenticationPrincipal UserDetails userDetails) {
+        orderService.verifyPickup(id, req.code(), userDetails.getUsername());
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 

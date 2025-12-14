@@ -29,8 +29,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -157,14 +156,12 @@ public class DeliveryPickupTest {
         Assertions.assertEquals(OrderStatus.PENDING, order1.getStatus());
 
         orderStateMachine.updateOrderStatus(order1);
-        Order updated1 = orderRepository.findById(Long.valueOf(order1.getId())).orElseThrow();
 
-        Assertions.assertEquals(OrderStatus.PREPARING, updated1.getStatus());
+        Assertions.assertEquals(OrderStatus.PREPARING, order1.getStatus());
 
-        orderStateMachine.updateOrderStatus(updated1);
-        Order updated2 = orderRepository.findById(Long.valueOf(order1.getId())).orElseThrow();
-        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, updated2.getStatus());
-        Assertions.assertNotNull(updated2.getPickupCode());
+        orderStateMachine.updateOrderStatus(order1);
+        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+        Assertions.assertNotNull(order1.getPickupCode());
     }
 
 
@@ -233,6 +230,251 @@ public class DeliveryPickupTest {
         mockMvc.perform(get("/drivers/orders/available").with(user(driver.getEmail()).roles("COURIER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3));
+
+        mockMvc.perform(get("/drivers/orders/available").with(user(customer.getEmail()).roles("CUSTOMER")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testClaimOrder() throws Exception {
+        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+
+        OrderCreationRequest orderDto = new OrderCreationRequest(
+                customer.getId(),
+                restaurant.getId(),
+                "Bob smith Home Address",
+                List.of(orderItem1, orderItem2)
+        );
+
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(orderDto)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+
+        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+        Order order1 = orders.get(0);
+
+        orderStateMachine.updateOrderStatus(order1);
+        orderStateMachine.updateOrderStatus(order1);
+
+        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+
+        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
+                .with(user(driver.getEmail()).roles("COURIER")))
+                .andExpect(status().isAccepted());
+
+        Assertions.assertEquals(OrderStatus.PICKED_UP, order1.getStatus());
+        Assertions.assertEquals(driver, order1.getDriver());
+    }
+
+    @Test
+    void testClaimOrderFail() throws Exception {
+        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+
+        OrderCreationRequest orderDto = new OrderCreationRequest(
+                customer.getId(),
+                restaurant.getId(),
+                "Bob smith Home Address",
+                List.of(orderItem1, orderItem2)
+        );
+
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(orderDto)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+
+        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+        Order order1 = orders.get(0);
+
+        orderStateMachine.updateOrderStatus(order1);
+        orderStateMachine.updateOrderStatus(order1);
+
+        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
+                .with(user(customer.getEmail()).roles("CUSTOMER")))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/drivers/orders/{id}/claim", "")
+                .with(user(driver.getEmail()).roles("COURIER")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testPickupOrder() throws Exception {
+        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+
+        OrderCreationRequest orderDto = new OrderCreationRequest(
+                customer.getId(),
+                restaurant.getId(),
+                "Bob smith Home Address",
+                List.of(orderItem1, orderItem2)
+        );
+
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(orderDto)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+
+        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+        Order order1 = orders.get(0);
+
+        orderStateMachine.updateOrderStatus(order1);
+        orderStateMachine.updateOrderStatus(order1);
+
+        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+
+        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
+                        .with(user(driver.getEmail()).roles("COURIER")))
+                .andExpect(status().isAccepted());
+
+        Assertions.assertEquals(OrderStatus.PICKED_UP, order1.getStatus());
+        Assertions.assertEquals(driver, order1.getDriver());
+
+        Order claimedOrder = orderRepository.findById(Long.valueOf(order1.getId())).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        String code = claimedOrder.getPickupCode();
+
+        PickupCodeRequest codeRequest = new PickupCodeRequest(code);
+
+        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(codeRequest))
+                .with(user(driver.getEmail()).roles("COURIER")))
+                .andExpect(status().isAccepted());
+
+        Assertions.assertEquals(OrderStatus.IN_TRANSIT, order1.getStatus());
+        Assertions.assertEquals(driver, order1.getDriver());
+    }
+
+    @Test
+    void testPickupOrderFail() throws Exception {
+        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+
+        OrderCreationRequest orderDto = new OrderCreationRequest(
+                customer.getId(),
+                restaurant.getId(),
+                "Bob smith Home Address",
+                List.of(orderItem1, orderItem2)
+        );
+
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(orderDto)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+
+        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+        Order order1 = orders.get(0);
+
+        orderStateMachine.updateOrderStatus(order1);
+        orderStateMachine.updateOrderStatus(order1);
+
+        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+
+        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
+                        .with(user(driver.getEmail()).roles("COURIER")))
+                .andExpect(status().isAccepted());
+
+        PickupCodeRequest codeRequest = new PickupCodeRequest(null);
+
+        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(codeRequest))
+                        .with(user(driver.getEmail()).roles("COURIER")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("Code is required"));
+
+        PickupCodeRequest codeRequest2 = new PickupCodeRequest("Bob smith Home Address");
+        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(codeRequest2))
+                .with(user(driver.getEmail()).roles("COURIER")))
+                .andExpect(status().isBadRequest());
+
+        Order claimedOrder = orderRepository.findById(Long.valueOf(order1.getId())).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        String code = claimedOrder.getPickupCode();
+
+        PickupCodeRequest codeRequest3 = new PickupCodeRequest(code);
+        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(codeRequest3))
+                .with(user("bobsmith@test.com").roles("COURIER")))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("This order is not assigned to you"));
+
+    }
+
+    @Test
+    void testDelivery() throws Exception {
+        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+
+        OrderCreationRequest orderDto = new OrderCreationRequest(
+                customer.getId(),
+                restaurant.getId(),
+                "Bob smith Home Address",
+                List.of(orderItem1, orderItem2)
+        );
+
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(orderDto)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+
+        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+        Order order1 = orders.get(0);
+
+        orderStateMachine.updateOrderStatus(order1);
+        orderStateMachine.updateOrderStatus(order1);
+
+        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+
+        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
+                        .with(user(driver.getEmail()).roles("COURIER")))
+                .andExpect(status().isAccepted());
+
+        Assertions.assertEquals(OrderStatus.PICKED_UP, order1.getStatus());
+        Assertions.assertEquals(driver, order1.getDriver());
+
+        Order claimedOrder = orderRepository.findById(Long.valueOf(order1.getId())).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        String code = claimedOrder.getPickupCode();
+
+        PickupCodeRequest codeRequest = new PickupCodeRequest(code);
+
+        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(codeRequest))
+                        .with(user(driver.getEmail()).roles("COURIER")))
+                .andExpect(status().isAccepted());
+
+        Assertions.assertEquals(OrderStatus.IN_TRANSIT, order1.getStatus());
+        Assertions.assertEquals(driver, order1.getDriver());
+
+        orderStateMachine.updateTransit(order1);
+
+        Assertions.assertEquals(OrderStatus.DELIVERED, order1.getStatus());
+
     }
 
 

@@ -108,6 +108,10 @@ public class OrderService {
 
     @Transactional
     public Order claimOrder(Integer orderId, String email) {
+        if (orderId == null) {
+            throw new NullPointerException("Order id is null");
+        }
+
         Order order = orderRepository.findById(Long.valueOf(orderId)).orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
         if (order.getStatus() != OrderStatus.READY_FOR_PICKUP) {
