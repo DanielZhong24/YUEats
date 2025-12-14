@@ -392,14 +392,14 @@ public class DeliveryPickupTest {
                         .with(user(driver.getEmail()).roles("COURIER")))
                 .andExpect(status().isAccepted());
 
-        PickupCodeRequest codeRequest = new PickupCodeRequest(null);
+        PickupCodeRequest codeRequest = new PickupCodeRequest("");
 
         mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(codeRequest))
                         .with(user(driver.getEmail()).roles("COURIER")))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("Code is required"));
+                .andExpect(jsonPath("$.code").value("must not be blank"));
 
         PickupCodeRequest codeRequest2 = new PickupCodeRequest("Bob smith Home Address");
         mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
