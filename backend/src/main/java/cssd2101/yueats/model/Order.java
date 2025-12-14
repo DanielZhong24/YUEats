@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Order{
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne

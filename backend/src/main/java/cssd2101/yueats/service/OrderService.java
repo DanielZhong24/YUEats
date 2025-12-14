@@ -5,7 +5,9 @@ import cssd2101.yueats.dto.OrderItemRequest;
 import cssd2101.yueats.model.*;
 import cssd2101.yueats.repository.*;
 import cssd2101.yueats.types.OrderStatus;
+import cssd2101.yueats.types.UserRole;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -94,7 +96,13 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public List<Order> getReadyOrders() {
+    public List<Order> getReadyOrders(UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
+
+        DeliveryDriver driver = (DeliveryDriver) user;
+        if (driver.getUserRole() != UserRole.COURIER) {
+            throw new IllegalStateException("Only couriers can be picked up");
+        }
         return orderRepository.findByStatus(OrderStatus.READY_FOR_PICKUP);
     }
 

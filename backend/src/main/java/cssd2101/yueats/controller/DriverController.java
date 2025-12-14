@@ -32,8 +32,8 @@ public class DriverController {
     }
 
     @GetMapping("/orders/available")
-    public ResponseEntity<List<Order>> getAvailableOrders() {
-        List<Order> readyOrders = orderService.getReadyOrders();
+    public ResponseEntity<List<Order>> getAvailableOrders(@AuthenticationPrincipal UserDetails userDetails) {
+        List<Order> readyOrders = orderService.getReadyOrders(userDetails);
         return new ResponseEntity<>(readyOrders, HttpStatus.OK);
     }
 
