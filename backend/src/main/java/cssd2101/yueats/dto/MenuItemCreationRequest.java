@@ -19,6 +19,8 @@ public record MenuItemCreationRequest(
         String description,
 
         @NotNull(groups = Default.class, message = "Price is mandatory")
-        Double price
+        Double price,
 
+        @NotBlank(groups=NotBlank.class, message = "Image url cannot be empty")
+        String img_url
 ) {}
