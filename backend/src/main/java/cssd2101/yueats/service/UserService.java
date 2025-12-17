@@ -22,11 +22,17 @@ public class UserService {
         this.encoder = bCryptPasswordEncoder;
     }
 
+    /**
+     * Register a customer
+     * @param dto The information from the request
+     * @return The new customer saved in the database
+     */
     public Customer registerCustomer(CustomerSignupRequest dto){
         if(userRepository.existsByEmail(dto.email())){
             throw new IllegalArgumentException("Email already exists");
         }
 
+        // Hash the password using bcrypt, and create the customer with the hashed password
         String hashed = encoder.encode(dto.password());
         Customer customer = userFactory.createCustomer(dto, hashed);
 
@@ -34,22 +40,34 @@ public class UserService {
         return userRepository.save(customer);
     }
 
+    /**
+     * Register a vendor
+     * @param dto The information from the request
+     * @return The new vendor saved in the database
+     */
     public Vendor registerVendor(VendorSignupRequest dto){
         if(userRepository.existsByEmail(dto.email())){
             throw new IllegalArgumentException("Email already exists");
         }
 
+        // Hash the password using bcrypt, and create the vendor with the hashed password
         String hashed = encoder.encode(dto.password());
         Vendor vendor = userFactory.createVendor(dto, hashed);
 
         return userRepository.save(vendor);
     }
 
+    /**
+     * Register a delivery driver
+     * @param dto The information from the request
+     * @return The new delivery driver saved in the database
+     */
     public DeliveryDriver registerDriver(CustomerSignupRequest dto){
         if (userRepository.existsByEmail(dto.email())){
             throw new IllegalArgumentException("Email already exists");
         }
 
+        // Hash the password using bcrypt, and create the delivery driver with the hashed password
         String hashed = encoder.encode(dto.password());
         DeliveryDriver driver = userFactory.createDriver(dto, hashed);
 

@@ -27,12 +27,23 @@ public class RestaurantController {
         this.menuItemService = menuItemService;
     }
 
+    /**
+     * Create a restaurant as a vendor
+     * @param restaurant The request containing the necessary information for creating a restaurant
+     * @return A response entity with the restaurant created
+     */
     @PostMapping()
     public ResponseEntity<Restaurant> createRestaurant(@Validated({ValidationOrder.class, Default.class}) @RequestBody RestaurantCreationRequest restaurant) {
         Restaurant rest = restaurantService.createRestaurant(restaurant);
         return new ResponseEntity<>(rest, HttpStatus.CREATED);
     }
 
+    /**
+     * Create a menu item
+     * @param menuItem The request sent from the client with the necessary information to create an item
+     * @param id The restaurant ID
+     * @return A response entity with the created item
+     */
     @PostMapping("/{id}/menu-item")
     public ResponseEntity<MenuItem> createMenuItem(@Validated({ValidationOrder.class, Default.class}) @RequestBody MenuItemCreationRequest menuItem, @PathVariable Integer id) {
 

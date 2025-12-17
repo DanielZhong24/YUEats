@@ -19,6 +19,11 @@ public class VendorController {
         this.userService = userService;
     }
 
+    /**
+     * Create a user with the vendor role
+     * @param dto The request information needed to create a vendor
+     * @return The response entity containing the vendor information
+     */
     @PostMapping()
     public ResponseEntity<Vendor> signup(@Validated({ValidationOrder.class, Default.class}) @RequestBody VendorSignupRequest dto){
         Vendor vendor = userService.registerVendor(dto);

@@ -22,10 +22,17 @@ public class RestaurantService {
         this.restaurantBuilder = restaurantBuilder;
     }
 
+    /**
+     * Create a restaurant
+     * @param req The information from the client
+     * @return The restaurant that was created
+     */
     public Restaurant createRestaurant(RestaurantCreationRequest req) {
+        // Find the user from the ID passed into the request
         User user = userRepository.findById(Long.valueOf(req.ownerId())).
                 orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Check if they have the vendor role
         if (user.getUserRole() != UserRole.VENDOR) {
             throw new IllegalArgumentException("User is not a vendor");
         }
@@ -34,6 +41,7 @@ public class RestaurantService {
             throw new IllegalArgumentException("Restaurant already exists");
         }
 
+        // Change type to vendor, create the restaurant and save it
         Vendor vendor = (Vendor) user;
         Restaurant restaurant = restaurantBuilder.createRestaurant(req, vendor);
         return restaurantRepository.save(restaurant);

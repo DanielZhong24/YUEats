@@ -20,6 +20,9 @@ public class OrderStatusScheduler {
         this.statusMachine = statusMachine;
     }
 
+    /**
+     * Updates orders that are either pending or preparing to its next status (simulates preparing/cooking)
+     */
     @Scheduled(fixedRate = 60000)
     private void updateOrder() {
         List<OrderStatus> statuses = List.of(OrderStatus.PENDING, OrderStatus.PREPARING);
@@ -31,6 +34,9 @@ public class OrderStatusScheduler {
         }
     }
 
+    /**
+     * Updates orders that are in transit to delivered (simulates delivering)
+     */
     @Scheduled(fixedRate = 60000)
     private void autoDeliver() {
         List<Order> inTransit = orderRepository.findByStatus(OrderStatus.IN_TRANSIT);

@@ -199,7 +199,7 @@ public class OrderControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sneakyOrder)))
                 .andExpect(status().isBadRequest())
-                // Assuming your service throws RuntimeException which is caught and returns the message
+
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("not from this restaurant")));
 
         Assertions.assertEquals(0, orderRepository.count());
@@ -218,7 +218,7 @@ public class OrderControllerTest {
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                // Based on your 'createRestaurantNoUser' test which expects error string
+
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Customer not found")));
     }

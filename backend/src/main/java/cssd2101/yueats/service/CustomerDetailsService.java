@@ -15,6 +15,13 @@ public class CustomerDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Get the userDetails object from Spring Security's authentication system
+     * to validate the user's credentials during login
+     * @param email The users email
+     * @return Details revolving the given user by email
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)

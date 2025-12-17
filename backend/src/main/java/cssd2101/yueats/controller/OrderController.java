@@ -18,6 +18,11 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    /**
+     * Create an order as a customer
+     * @param request The request information from the client
+     * @return A response entity with the new order that was created
+     */
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody @Valid OrderCreationRequest request) {
         Order newOrder = orderService.createOrder(request);
