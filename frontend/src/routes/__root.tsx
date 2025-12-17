@@ -10,7 +10,6 @@ import type { QueryClient } from '@tanstack/react-query'
 import { ThemeModeToggle } from '@/components/theme-mode-toggle'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
-import { themeScript } from '@/lib/theme-script'
 
 interface MyRouterContext {
   queryClient: QueryClient
