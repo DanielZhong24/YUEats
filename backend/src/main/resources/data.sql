@@ -1,17 +1,18 @@
 -- Assuming a table structure:
 -- (id, user_role, email, password_hash, first_name, last_name, phone_number)
+-- All users have password: password123
 
 -- 1. Alice (Customer) - ID: 1
 INSERT INTO app_user (user_role, email, password_hash, first_name, last_name, phone_number, is_verified)
-VALUES ('CUSTOMER', 'alice@test.com', '$2a$10$Un6jG.iG.YV.x/P.x/P.x/P.x/P.x/P.x/P.x/P.x/P.x/P.', 'Alice', 'Wonderland', '555-0100', TRUE);
+VALUES ('CUSTOMER', 'alice@test.com', '$2a$12$YNkxPPRsTZhebwexTRaGceLgoQDIeaSmDU40w1WKAsUMfQDRHKXbC', 'Alice', 'Wonderland', '555-0100', TRUE);
 
 -- 2. Bob (Vendor) - ID: 2
 INSERT INTO app_user (user_role, email, password_hash, first_name, last_name, phone_number, business_name, is_verified)
-VALUES ('VENDOR', 'bob@test.com', '$2a$10$Un6jG.iG.YV.x/P.x/P.x/P.x/P.x/P.x/P.x/P.x/P.x/P.', 'Bob', 'Builder', '555-0200', 'Bobs Foods Inc', TRUE);
+VALUES ('VENDOR', 'bob@test.com', '$2a$12$YNkxPPRsTZhebwexTRaGceLgoQDIeaSmDU40w1WKAsUMfQDRHKXbC', 'Bob', 'Builder', '555-0200', 'Bobs Foods Inc', TRUE);
 
 -- 3. Admin - ID: 3
 INSERT INTO app_user (user_role, email, password_hash, first_name, last_name, is_verified)
-VALUES ('ADMIN', 'admin@yueats.com', '$2a$10$Un6jG.iG.YV.x/P.x/P.x/P.x/P.x/P.x/P.x/P.x/P.x/P.', 'System', 'Admin', TRUE);
+VALUES ('ADMIN', 'admin@yueats.com', '$2a$12$YNkxPPRsTZhebwexTRaGceLgoQDIeaSmDU40w1WKAsUMfQDRHKXbC', 'System', 'Admin', TRUE);
 
 -- Restaurant 1: Bob's Burgers - ID: 1
 INSERT INTO restaurants (owner_id, restaurant_name, address)
