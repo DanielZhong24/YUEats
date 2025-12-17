@@ -1,31 +1,57 @@
-export type SignupPayload = {
+// User Role Types
+export type UserRole = 'CUSTOMER' | 'VENDOR' | 'DRIVER'
+
+// Base User Interface
+export interface User {
+  id: number
+  email: string
   firstName: string
   lastName: string
-  businessName?: string
+  phoneNumber: string
+  userRole: UserRole
+  isVerified: boolean
+}
+
+// Specific User Types
+export interface Customer extends User {
+  userRole: 'CUSTOMER'
+}
+
+export interface Vendor extends User {
+  userRole: 'VENDOR'
+  businessName: string
+  ownedRestaurants?: Restaurant[]
+}
+
+export interface DeliveryDriver extends User {
+  userRole: 'DRIVER'
+}
+
+// Discriminated Union of All User Types
+export type AppUser = Customer | Vendor | DeliveryDriver
+
+// Restaurant Interface
+export interface Restaurant {
+  id: number
+  restaurantName: string
+  address: string
+}
+
+// Signup Request Interfaces
+export interface SignupPayload {
+  firstName: string
+  lastName: string
   email: string
   phoneNumber: string
   password: string
 }
 
-export type SignupResponse = {
-  id: number
-  email: string
-  passwordHash: string
-  firstName: string
-  lastName: string
-  phoneNumber: string
-  userRole: 'VENDOR' | 'CUSTOMER'
-  isVerified: boolean
-  businessName?: string
-  ownedRestaurants?: any[]
-}
-
-export type VendorSignup = Omit<SignupPayload, 'businessName'> & {
+export interface VendorSignupPayload extends SignupPayload {
   businessName: string
 }
 
-export type VendorSignupPayload = Omit<VendorSignup, 'passwordConfirm'>
-
-export type CustomerSignup = Omit<SignupPayload, 'businessName'>
-
-export type CustomerSignupPayload = Omit<CustomerSignup, 'passwordConfirm'>
+// Signup Response Interface
+export interface SignupResponse extends User {
+  businessName?: string
+  ownedRestaurants?: Restaurant[]
+}

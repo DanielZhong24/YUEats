@@ -18,7 +18,7 @@ function App() {
           <Link to="/vendor">Vendor</Link>
         </Button>
         <Button>
-          <Link to="/restaurant">Restaurant</Link>
+          <Link to="/drivers">Restaurant</Link>
         </Button>
       </div>
     </div>

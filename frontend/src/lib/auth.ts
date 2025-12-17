@@ -1,9 +1,16 @@
 import { SignupPayload, SignupResponse } from '../types/users'
 
+const checkBackendUrl = () => {
+  if (!import.meta.env.VITE_BACKEND_URL) {
+    throw new Error('VITE_BACKEND_URL is not defined in environment variables')
+  }
+}
+
 export const signupUser = async (
   userType: 'vendors' | 'customers',
   payload: SignupPayload,
 ): Promise<SignupResponse> => {
+  checkBackendUrl()
   const response = await fetch(
     `${import.meta.env.VITE_BACKEND_URL}/${userType}`,
     {
