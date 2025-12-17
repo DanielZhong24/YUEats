@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.groups.Default;
-import lombok.*;
 
 public record RestaurantCreationRequest(
         @NotBlank(groups = NotBlankCheck.class, message = "Restaurant name is mandatory")
@@ -17,6 +16,9 @@ public record RestaurantCreationRequest(
         Integer ownerId,
 
         @NotBlank(groups = Default.class, message = "Address is mandatory")
-        String address
+        String address,
+
+        @NotBlank(groups=NotBlank.class, message = "Image url cannot be empty")
+        String banner_img_url
 )
 {}

@@ -32,4 +32,7 @@ public class MenuItem {
 
     @Column(name = "price")
     private BigDecimal price;
+
+    @Column(name = "img_url")
+    private String img_url;
 }
