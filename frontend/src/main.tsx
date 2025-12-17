@@ -1,34 +1,20 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { RouterProvider } from '@tanstack/react-router'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
-
-// Import the generated route tree
-import { routeTree } from './routeTree.gen'
+import { AuthProvider, useAuth } from './auth'
+import { router } from './router'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 
-// Create a new router instance
+// Inner component to access auth context
+function InnerApp() {
+  const auth = useAuth()
+  const queryClient = TanStackQueryProvider.getContext().queryClient
 
-const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
-const router = createRouter({
-  routeTree,
-  context: {
-    ...TanStackQueryProviderContext,
-  },
-  defaultPreload: 'intent',
-  scrollRestoration: true,
-  defaultStructuralSharing: true,
-  defaultPreloadStaleTime: 0,
-})
-
-// Register the router instance for type safety
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
+  return <RouterProvider router={router} context={{ auth, queryClient }} />
 }
 
 // Render the app
@@ -37,9 +23,11 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <RouterProvider router={router} />
-      </TanStackQueryProvider.Provider>
+      <AuthProvider>
+        <TanStackQueryProvider.Provider {...TanStackQueryProvider.getContext()}>
+          <InnerApp />
+        </TanStackQueryProvider.Provider>
+      </AuthProvider>
     </StrictMode>,
   )
 }

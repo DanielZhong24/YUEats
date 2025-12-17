@@ -11,8 +11,16 @@ import { ThemeModeToggle } from '@/components/theme-mode-toggle'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
+interface AuthState {
+  isAuthenticated: boolean
+  user: { id: string; username: string; email: string } | null
+  login: (username: string, password: string) => Promise<void>
+  logout: () => void
+}
+
 interface MyRouterContext {
   queryClient: QueryClient
+  auth: AuthState
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
