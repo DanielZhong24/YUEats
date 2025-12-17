@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -38,24 +37,25 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-        http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**","/vendors",
+        http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/vendors",
                 "/customers",
                 "/users",
                 "/login",
                 "/logout"))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/customers", "/vendors","/users", "/h2-console/**", "/login")
-                        .permitAll()
-                        .requestMatchers("/vendors/**").hasRole("VENDOR")
-                        .requestMatchers("/customers/**").hasRole("CUSTOMER")
-                        .requestMatchers("/drivers/**").hasRole("COURIER")
-                        .anyRequest().authenticated())
-                        .formLogin(withDefaults())
-                        .logout(logout -> logout.logoutUrl("/logout")
+                .authorizeHttpRequests(
+                        auth -> auth.requestMatchers("/customers", "/vendors", "/users", "/h2-console/**", "/login")
+                                .permitAll()
+                                .requestMatchers("/users/me").authenticated()
+                                .requestMatchers("/vendors/**").hasRole("VENDOR")
+                                .requestMatchers("/customers/**").hasRole("CUSTOMER")
+                                .requestMatchers("/drivers/**").hasRole("COURIER")
+                                .anyRequest().authenticated())
+                .formLogin(withDefaults())
+                .logout(logout -> logout.logoutUrl("/logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler((req, res, auth) -> {
@@ -64,8 +64,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
