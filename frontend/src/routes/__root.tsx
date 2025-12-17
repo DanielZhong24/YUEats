@@ -1,21 +1,20 @@
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import { formDevtoolsPlugin } from '@tanstack/react-form-devtools'
+import type { QueryClient } from '@tanstack/react-query'
 import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
 
-import type { QueryClient } from '@tanstack/react-query'
-
+import { ThemeModeToggle } from '@/components/theme-mode-toggle'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { themeScript } from '@/lib/theme-script'
-import { ThemeModeToggle } from '@/components/theme-mode-toggle'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -71,6 +70,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               render: <TanStackRouterDevtoolsPanel />,
             },
             TanStackQueryDevtools,
+            formDevtoolsPlugin(),
           ]}
         />
         <Scripts />
