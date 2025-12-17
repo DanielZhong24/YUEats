@@ -5,7 +5,9 @@ import cssd2101.yueats.dto.OrderItemRequest;
 import cssd2101.yueats.model.*;
 import cssd2101.yueats.repository.*;
 import cssd2101.yueats.types.OrderStatus;
+import cssd2101.yueats.types.UserRole;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,6 +31,11 @@ public class OrderService {
         this.restaurantRepository = restRepo;
     }
 
+    /**
+     * Create an order by customer
+     * @param request The request sent from the client containing information to create an order
+     * @return The order saved in the database
+     */
     @Transactional
     public Order createOrder(OrderCreationRequest request) {
 
@@ -38,6 +45,7 @@ public class OrderService {
         Restaurant restaurant = restaurantRepository.findById(Long.valueOf(request.restaurantId()))
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
+        // Manually create order with the information
         Order order = new Order();
         order.setCustomer(customer);
         order.setRestaurant(restaurant);
@@ -48,6 +56,7 @@ public class OrderService {
         BigDecimal calculatedTotal = BigDecimal.ZERO;
         List<OrderDetail> detailsList = new ArrayList<>();
 
+        // Search for items
         for (OrderItemRequest itemDTO : request.items()) {
             MenuItem dbItem = menuItemRepository.findById(Long.valueOf(itemDTO.menuItemId()))
                     .orElseThrow(() -> new RuntimeException("Menu item not found"));
@@ -56,6 +65,7 @@ public class OrderService {
                 throw new RuntimeException("Item " + dbItem.getItemName() + " is not from this restaurant");
             }
 
+            // Manually create order details with the information
             OrderDetail detail = new OrderDetail();
             detail.setOrder(order);
             detail.setMenuItem(dbItem);
@@ -68,12 +78,19 @@ public class OrderService {
             detailsList.add(detail);
         }
 
+        // Set the price, details and save to database
         order.setTotalPrice(calculatedTotal);
         order.setOrderDetails(detailsList); // Cascade will save these automatically
 
         return orderRepository.save(order);
     }
 
+    /**
+     * Verify that the order has been picked up by the driver
+     * @param orderId The order ID
+     * @param code The pickup code
+     * @param email The driver's email
+     */
     public void verifyPickup(Integer orderId, String code, String email) {
         Order order = orderRepository.findById(Long.valueOf(orderId)).orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
@@ -89,27 +106,53 @@ public class OrderService {
             throw new  IllegalStateException("This order is not assigned to you");
         }
 
+        // If it passes the previous checks, set the status to in transit
+        // Update the order in the database
         order.setStatus(OrderStatus.IN_TRANSIT);
         order.setLastUpdated(LocalDateTime.now());
         orderRepository.save(order);
     }
 
-    public List<Order> getReadyOrders() {
+    /**
+     * Get all orders with the ready for pickup status
+     * @param userDetails The logged in delivery drivers details
+     * @return List of orders that have the ready for pickup status
+     */
+    public List<Order> getReadyOrders(UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
+
+        DeliveryDriver driver = (DeliveryDriver) user;
+        if (driver.getUserRole() != UserRole.COURIER) {
+            throw new IllegalStateException("Only couriers can be picked up");
+        }
         return orderRepository.findByStatus(OrderStatus.READY_FOR_PICKUP);
     }
 
+    /**
+     * Claim an order
+     * @param orderId The order ID
+     * @param email The delivery driver's email
+     * @return The order that was claimed
+     */
     @Transactional
     public Order claimOrder(Integer orderId, String email) {
+        if (orderId == null) {
+            throw new NullPointerException("Order id is null");
+        }
+
+        // Find order by the given id
         Order order = orderRepository.findById(Long.valueOf(orderId)).orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
         if (order.getStatus() != OrderStatus.READY_FOR_PICKUP) {
             throw new IllegalStateException("Order status is not ready yet");
         }
-
+        // Find user with the given email
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        // Convert type to delivery driver
         DeliveryDriver driver = (DeliveryDriver) user;
 
+        // Update order details with driver, new status
         order.setDriver(driver);
         order.setStatus(OrderStatus.PICKED_UP);
         order.setLastUpdated(LocalDateTime.now());

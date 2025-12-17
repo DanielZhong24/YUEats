@@ -1,5 +1,6 @@
 package cssd2101.yueats.configuration;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -7,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,8 +23,8 @@ import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
@@ -35,28 +37,33 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-        http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**","/vendors",
+        http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/vendors",
                 "/customers",
                 "/users",
-                "/login"))
+                "/login",
+                "/logout"))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/customers", "/vendors","/users", "/h2-console/**", "/login")
-                        .permitAll()
-                        .requestMatchers("/vendors/**").hasRole("VENDOR")
-                        .requestMatchers("/customers/**").hasRole("CUSTOMER")
-                        .anyRequest().authenticated())
-                        .formLogin(withDefaults());
-
-
+                .authorizeHttpRequests(
+                        auth -> auth.requestMatchers("/customers", "/vendors", "/users", "/h2-console/**", "/login")
+                                .permitAll()
+                                .requestMatchers("/users/me").authenticated()
+                                .requestMatchers("/vendors/**").hasRole("VENDOR")
+                                .requestMatchers("/customers/**").hasRole("CUSTOMER")
+                                .requestMatchers("/drivers/**").hasRole("COURIER")
+                                .anyRequest().authenticated())
+                .formLogin(withDefaults())
+                .logout(logout -> logout.logoutUrl("/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler((req, res, auth) -> {
+                            res.setStatus(HttpServletResponse.SC_OK);
+                        }));
 
         return http.build();
     }
-
-
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

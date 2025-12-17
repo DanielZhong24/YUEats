@@ -20,21 +20,35 @@ public class RestaurantBuilder {
         this.restaurantRepository = restaurantRepository;
     }
 
+    /**
+     * Creates a restaurant from the data sent from the client
+     * @param dto
+     * @param owner
+     * @return Restaurant
+     */
     public Restaurant createRestaurant(RestaurantCreationRequest dto, Vendor owner) {
+        // Builds the restaurant
         Restaurant restaurant = Restaurant.builder()
                 .restaurantName(dto.restaurantName())
                 .owner(owner)
                 .address(dto.address())
                 .build();
-
+        // Adds the restaurant to the list of owned restaurants by the owner
         owner.addRestaurant(restaurant);
         return restaurant;
     }
 
+    /**
+     * Creates a menu item from the request sent from the client
+     * @param dto
+     * @param restaurantId
+     * @return menuItem, the Menu item created for the specific restaurant
+     */
     public MenuItem createMenuItem(MenuItemCreationRequest dto, Integer restaurantId) {
         Restaurant restaurant = restaurantRepository.findById(Long.valueOf(restaurantId))
                 .orElseThrow(() -> new RuntimeException("restaurant not found"));
 
+        // Builds the menu item
         MenuItem menuItem =  MenuItem.builder()
                 .itemName(dto.itemName())
                 .price(BigDecimal.valueOf(dto.price()))
@@ -42,6 +56,7 @@ public class RestaurantBuilder {
                 .restaurant(restaurant)
                 .build();
 
+        // Adds the menu item to the specific restaurant
         restaurant.addMenuItem(menuItem);
         return menuItem;
 

@@ -19,7 +19,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Find by Status (e.g., show me all "PENDING" orders)
     List<Order> findByRestaurantIdAndStatus(Integer restaurantId, OrderStatus status);
 
+    // Find all orders that fall within a list of statuses
     List<Order> findByStatusIn(List<OrderStatus> statuses);
 
+    // Find all orders that have a specific status
     List<Order> findByStatus(OrderStatus status);
 }

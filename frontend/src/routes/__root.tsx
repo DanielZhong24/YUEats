@@ -1,80 +1,51 @@
-import {
-  HeadContent,
-  Scripts,
-  createRootRouteWithContext,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { formDevtoolsPlugin } from '@tanstack/react-form-devtools'
+import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
-import appCss from '../styles.css?url'
-
 import type { QueryClient } from '@tanstack/react-query'
 
+import { ThemeModeToggle } from '@/components/theme-mode-toggle'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
-import { themeScript } from '@/lib/theme-script'
-import { ThemeModeToggle } from '@/components/theme-mode-toggle'
+
+interface AuthState {
+  isAuthenticated: boolean
+  user: { id: string; username: string; email: string } | null
+  login: (username: string, password: string) => Promise<void>
+  logout: () => void
+}
 
 interface MyRouterContext {
   queryClient: QueryClient
+  auth: AuthState
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'YUEats',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-  }),
-
-  shellComponent: RootDocument,
+  component: () => (
+    <>
+      <ThemeProvider defaultTheme="dark" storageKey="yueats-theme">
+        <Toaster />
+        <Outlet />
+        <div className="absolute bottom-0 left-0 p-3">
+          <ThemeModeToggle />
+        </div>
+      </ThemeProvider>
+      <TanStackDevtools
+        config={{
+          position: 'bottom-right',
+        }}
+        plugins={[
+          {
+            name: 'Tanstack Router',
+            render: <TanStackRouterDevtoolsPanel />,
+          },
+          TanStackQueryDevtools,
+          formDevtoolsPlugin(),
+        ]}
+      />
+    </>
+  ),
 })
-
-function RootDocument({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
-      <body>
-        <ThemeProvider defaultTheme="dark" storageKey="yueats-theme">
-          <Toaster />
-          {children}
-          <div className="absolute bottom-0 left-0 p-3">
-            <ThemeModeToggle />
-          </div>
-        </ThemeProvider>
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-        />
-        <Scripts />
-      </body>
-    </html>
-  )
-}

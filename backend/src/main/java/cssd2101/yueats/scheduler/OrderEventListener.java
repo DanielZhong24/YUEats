@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class OrderEventListener {
+    // Logger for order statuses changing
     @EventListener
     public void handleOrderEvent(OrderStatusEvent event) {
         System.out.println("Order event received: " + event);

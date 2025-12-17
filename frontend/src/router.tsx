@@ -1,28 +1,34 @@
 import { createRouter } from '@tanstack/react-router'
-import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
-import * as TanstackQuery from './integrations/tanstack-query/root-provider'
-
-// Import the generated route tree
 import { routeTree } from './routeTree.gen'
+import type { QueryClient } from '@tanstack/react-query'
 
-// Create a new router instance
-export const getRouter = () => {
-  const rqContext = TanstackQuery.getContext()
+interface AuthState {
+  isAuthenticated: boolean
+  user: { id: string; username: string; email: string } | null
+  login: (username: string, password: string) => Promise<void>
+  logout: () => void
+}
 
-  const router = createRouter({
-    routeTree,
-    context: { ...rqContext },
-    defaultPreload: 'intent',
-    Wrap: (props: { children: React.ReactNode }) => {
-      return (
-        <TanstackQuery.Provider {...rqContext}>
-          {props.children}
-        </TanstackQuery.Provider>
-      )
-    },
-  })
+interface MyRouterContext {
+  queryClient: QueryClient
+  auth: AuthState
+}
 
-  setupRouterSsrQueryIntegration({ router, queryClient: rqContext.queryClient })
+export const router = createRouter({
+  routeTree,
+  context: {
+    // auth and queryClient will be passed down from main.tsx
+    auth: undefined!,
+    queryClient: undefined!,
+  },
+  defaultPreload: 'intent',
+  scrollRestoration: true,
+  defaultStructuralSharing: true,
+  defaultPreloadStaleTime: 0,
+})
 
-  return router
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
 }

@@ -17,6 +17,12 @@ public class MenuItemService {
         this.restaurantBuilder = restaurantBuilder;
     }
 
+    /**
+     * Create a menu item using the builder pattern
+     * @param req The request sent from the client
+     * @param restaurantId The restaurant ID
+     * @return The created restaurant saved in the database
+     */
     public MenuItem createMenuItem(MenuItemCreationRequest req, Integer restaurantId) {
 
         if (menuItemRepository.existsByRestaurantIdAndItemName(restaurantId, req.itemName())) {
