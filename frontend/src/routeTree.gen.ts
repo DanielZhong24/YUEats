@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthsRouteImport } from './routes/auths'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as CustomerRouteRouteImport } from './routes/customer/route'
@@ -26,11 +25,6 @@ import { Route as AuthenticatedVendorPrepRouteImport } from './routes/_authentic
 import { Route as AuthenticatedVendorMenuRouteImport } from './routes/_authenticated/vendor/menu'
 import { Route as AuthenticatedVendorRestaurantsCreateIndexRouteImport } from './routes/_authenticated/vendor/restaurants/create/index'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthsRoute = AuthsRouteImport.update({
   id: '/auths',
   path: '/auths',
@@ -115,7 +109,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/customer': typeof CustomerRouteRouteWithChildren
   '/auths': typeof AuthsRoute
-  '/login': typeof LoginRoute
   '/vendor': typeof AuthenticatedVendorRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/customer/checkout': typeof CustomerCheckoutRoute
@@ -131,7 +124,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auths': typeof AuthsRoute
-  '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/customer/checkout': typeof CustomerCheckoutRoute
   '/customer/orders': typeof CustomerOrdersRoute
@@ -149,7 +141,6 @@ export interface FileRoutesById {
   '/customer': typeof CustomerRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auths': typeof AuthsRoute
-  '/login': typeof LoginRoute
   '/_authenticated/vendor': typeof AuthenticatedVendorRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/customer/checkout': typeof CustomerCheckoutRoute
@@ -168,7 +159,6 @@ export interface FileRouteTypes {
     | '/'
     | '/customer'
     | '/auths'
-    | '/login'
     | '/vendor'
     | '/dashboard'
     | '/customer/checkout'
@@ -184,7 +174,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auths'
-    | '/login'
     | '/dashboard'
     | '/customer/checkout'
     | '/customer/orders'
@@ -201,7 +190,6 @@ export interface FileRouteTypes {
     | '/customer'
     | '/_authenticated'
     | '/auths'
-    | '/login'
     | '/_authenticated/vendor'
     | '/_authenticated/dashboard'
     | '/customer/checkout'
@@ -220,18 +208,10 @@ export interface RootRouteChildren {
   CustomerRouteRoute: typeof CustomerRouteRouteWithChildren
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthsRoute: typeof AuthsRoute
-  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auths': {
       id: '/auths'
       path: '/auths'
@@ -400,7 +380,6 @@ const rootRouteChildren: RootRouteChildren = {
   CustomerRouteRoute: CustomerRouteRouteWithChildren,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthsRoute: AuthsRoute,
-  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

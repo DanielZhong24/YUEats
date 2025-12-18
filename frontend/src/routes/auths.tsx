@@ -1,33 +1,36 @@
-import { AuthForm } from '@/components/forms/auth-form'
-import { createFileRoute } from '@tanstack/react-router'
+import { useLoginMutation, useSignupMutation } from '@/auth/provider'
+import type { LoginPayload, VendorSignupPayload } from '@/auth/types'
+import { AuthCard } from '@/components/auth-card'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { useSignupMutation } from '@/auth/provider'
 
 export const Route = createFileRoute('/auths')({
   validateSearch: (search) => ({
     redirect: (search.redirect as string) || '/',
   }),
+  beforeLoad: ({ context, search }) => {
+    // Redirect if already authenticated
+    if (context.auth.isAuthenticated) {
+      throw redirect({ to: search.redirect as any })
+    }
+  },
   component: AuthPage,
 })
 
 function AuthPage() {
+  const router = useRouter()
   const signupMutation = useSignupMutation()
+  const loginMutation = useLoginMutation()
 
-  const handleSubmit = async (data: {
-    firstName: string
-    lastName: string
-    businessName: string
-    email: string
-    phoneNumber: string
-    password: string
-  }) => {
+  const handleSignup = async (data: VendorSignupPayload) => {
     signupMutation.mutate(
       { userType: 'vendors', payload: data },
       {
         onSuccess: () => {
           toast.success('Account Created Successfully!', {
-            description: 'You can now log in with your credentials.',
+            description: 'Welcome to YUEats!',
           })
+          router.navigate({ to: '/dashboard' })
         },
         onError: (error) => {
           toast.error('Signup failed!', {
@@ -38,12 +41,29 @@ function AuthPage() {
     )
   }
 
+  const handleLogin = async (data: LoginPayload) => {
+    loginMutation.mutate(data, {
+      onSuccess: () => {
+        toast.success('Login Successful!', {
+          description: 'Welcome back to YUEats!',
+        })
+        router.navigate({ to: '/dashboard' })
+      },
+      onError: (error) => {
+        toast.error('Login failed!', {
+          description: error.message || 'Invalid credentials',
+        })
+      },
+    })
+  }
+
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-6 bg-muted min-h-svh md:p-10">
       <div className="flex flex-col w-full max-w-sm gap-6">
-        <AuthForm
-          onSubmit={handleSubmit}
-          isPending={signupMutation.isPending}
+        <AuthCard
+          onSignup={handleSignup}
+          onLogin={handleLogin}
+          isPending={signupMutation.isPending || loginMutation.isPending}
         />
       </div>
     </div>
