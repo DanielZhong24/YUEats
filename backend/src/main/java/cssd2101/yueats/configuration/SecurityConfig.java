@@ -72,7 +72,19 @@ public class SecurityConfig {
                             response.setContentType("application/json");
                             response.getWriter().write("{\"error\": \"Unauthorized access\"}");
                         }))
-                .formLogin(withDefaults())
+                .formLogin(form -> form
+                        .successHandler((request, response, authentication) -> {
+                            // Return 200 OK instead of redirecting after successful login
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"message\": \"Login successful\"}");
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            // Return 401 for failed login attempts
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Authentication failed\"}");
+                        }))
                 .logout(logout -> logout.logoutUrl("/logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
