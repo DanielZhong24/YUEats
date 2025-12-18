@@ -1,101 +1,136 @@
+import { useAuth } from '@/auth/provider' // 👈 Use your AuthContext
 import { useCartStore } from '@/store/useCartStore'
-import { ShoppingBag, ChevronLeft, Trash2, Clock } from 'lucide-react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Trash2, Clock, MapPin, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import * as customerService from '@/services/customer'
+import { useState } from 'react'
+
+const CAMPUSES = [
+  { id: 'Keele', name: 'Keele Campus', address: '4700 Keele St, Toronto, ON' },
+  { id: 'Glendon', name: 'Glendon Campus', address: '2275 Bayview Ave, Toronto, ON' },
+  { id: 'Markham', name: 'Markham Campus', address: '1 University Blvd, Markham, ON' }
+]
 
 export default function CheckoutPage() {
-  const { items, getTotal, clearCart } = useCartStore()
+  // 1. Properly pull the user from your context
+  const { user, isAuthenticated } = useAuth() 
+  const { items, getTotal, clearCart, removeItem } = useCartStore()
   const navigate = useNavigate()
+  
+  const [selectedCampus, setSelectedCampus] = useState(CAMPUSES[0])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+const handlePlaceOrder = async () => {
+  // 1. Group items by their restaurantId
+  const groups = items.reduce((acc, item) => {
+    if (!acc[item.restaurantId]) acc[item.restaurantId] = [];
+    acc[item.restaurantId].push(item);
+    return acc;
+  }, {} as Record<number, typeof items>);
 
-  const handlePlaceOrder = async () => {
-    // This is where you would call your API: axios.post('/orders', { items, total: getTotal() })
-    alert("Order placed successfully for pickup!")
-    clearCart()
-    navigate({ to: '/customer/dashboard' })
-  }
+  setIsSubmitting(true);
 
-  if (items.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
-        <div className="bg-slate-100 p-6 rounded-full">
-          <ShoppingBag size={48} className="text-slate-400" />
-        </div>
-        <h2 className="text-2xl font-bold">Your cart is empty</h2>
-        <Link to="/customer/dashboard" className="text-green-600 font-bold hover:underline">
-          Go back to browse restaurants
-        </Link>
-      </div>
-    )
+  try {
+    // 2. Create an array of promises (one for each restaurant)
+    const orderPromises = Object.entries(groups).map(([rId, groupItems]) => {
+      const payload = {
+        customerId: Number(user?.id),
+        restaurantId: Number(rId),
+        deliveryAddress: selectedCampus.name,
+        items: groupItems.map(i => ({
+          menuItemId: Number(i.id),
+          quantity: Number(i.quantity)
+        }))
+      };
+      return customerService.createOrder(payload); // API Call
+    });
+
+    // 3. Fire all orders at once
+    await Promise.all(orderPromises);
+
+    alert(`Successfully placed ${Object.keys(groups).length} separate orders!`);
+    clearCart();
+    navigate({ to: '/customer/dashboard' });
+  } catch (error) {
+    console.error("One or more orders failed", error);
+  } finally {
+    setIsSubmitting(false);
   }
+};
 
   return (
-    <div className="max-w-[800px] mx-auto p-8">
-      <Link to="/customer" className="flex items-center gap-1 text-sm font-bold mb-8 hover:text-slate-600">
-        <ChevronLeft size={16} /> Back to browsing
-      </Link>
+    <div className="max-w-[1000px] mx-auto p-8 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="lg:col-span-2 space-y-8">
+        <h1 className="text-4xl font-black italic tracking-tighter">Checkout</h1>
 
-      <h1 className="text-4xl font-black mb-8">Your Order</h1>
-
-      <div className="space-y-6">
-        {/* Pickup Info Header */}
-        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-          <div className="flex items-center gap-3">
-            <Clock className="text-green-600" size={20} />
-            <div>
-              <p className="font-bold text-sm">Pickup estimate</p>
-              <p className="text-xs text-slate-500 font-medium">Ready in 15–25 min</p>
-            </div>
-          </div>
-          <button className="text-xs font-bold bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
-            Change
-          </button>
+        {/* User Info Section */}
+        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 text-sm">
+          <p className="text-slate-500 font-bold uppercase text-[10px]">Ordering as</p>
+          <p className="font-bold text-slate-900">{user?.firstName} {user?.lastName} ({user?.email})</p>
         </div>
 
-        {/* Item List */}
-        <div className="divide-y divide-slate-100">
-          {items.map((item) => (
-            <div key={item.id} className="py-6 flex justify-between items-center">
-              <div className="flex gap-4">
-                <div className="bg-slate-100 px-3 py-1 rounded-md h-fit font-bold text-sm">
-                  {item.quantity}
+        {/* Campus Selector */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <MapPin size={22} className="text-red-600" /> Pickup Campus
+          </h2>
+          <div className="grid grid-cols-1 gap-3">
+            {CAMPUSES.map((campus) => (
+              <button
+                key={campus.id}
+                onClick={() => setSelectedCampus(campus)}
+                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
+                  selectedCampus.id === campus.id ? 'border-black bg-slate-50' : 'border-slate-100'
+                }`}
+              >
+                <div className="text-left">
+                  <p className="font-bold text-slate-900">{campus.name}</p>
                 </div>
-                <div>
-                  <h4 className="font-bold">{item.itemName}</h4>
-                  <p className="text-xs text-slate-500 font-medium">Standard preparation</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-6">
-                <span className="font-bold text-sm">${(item.price * item.quantity).toFixed(2)}</span>
-                <button className="text-slate-300 hover:text-red-500 transition-colors">
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+                {selectedCampus.id === campus.id && <CheckCircle2 size={20} className="text-black" />}
+              </button>
+            ))}
+          </div>
+        </section>
 
-        {/* Order Summary */}
-        <div className="pt-8 space-y-3 border-t-2 border-slate-100">
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-500 font-medium">Subtotal</span>
-            <span className="font-medium">${getTotal().toFixed(2)}</span>
+        {/* Review Items */}
+        <section className="space-y-4 pt-4 border-t border-slate-100">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Clock size={22} className="text-green-600" /> Order Summary
+          </h2>
+          <div className="bg-white rounded-2xl border border-slate-100">
+            {items.map((item) => (
+              <div key={item.id} className="p-4 flex justify-between items-center border-b last:border-none">
+                <div className="flex items-center gap-4">
+                  <span className="font-black text-xs">{item.quantity}×</span>
+                  <p className="font-bold">{item.itemName}</p>
+                </div>
+                <div className="flex items-center gap-6">
+                  <span className="font-bold">${(item.price * item.quantity).toFixed(2)}</span>
+                  <button onClick={() => removeItem(item.id)} className="text-slate-300 hover:text-red-500">
+                    <Trash2 size={18}/>
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-500 font-medium">Taxes & Fees</span>
-            <span className="font-medium">$0.00</span>
-          </div>
-          <div className="flex justify-between text-xl font-black pt-2">
+        </section>
+      </div>
+
+      {/* Sidebar Summary */}
+      <div className="lg:col-span-1">
+        <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-2xl sticky top-24 space-y-6">
+          <div className="flex justify-between text-2xl font-black">
             <span>Total</span>
             <span>${getTotal().toFixed(2)}</span>
           </div>
-        </div>
 
-        {/* Action Button */}
-        <button 
-          onClick={handlePlaceOrder}
-          className="w-full bg-black text-white py-4 rounded-xl font-bold text-lg mt-8 hover:bg-slate-800 transition-all shadow-xl"
-        >
-          Place Pickup Order
-        </button>
+          <button 
+            onClick={handlePlaceOrder}
+            disabled={isSubmitting}
+            className="w-full bg-black text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3"
+          >
+            {isSubmitting ? <Loader2 className="animate-spin" /> : <>Place Order <ChevronRight /></>}
+          </button>
+        </div>
       </div>
     </div>
   )

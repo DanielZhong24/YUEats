@@ -42,3 +42,9 @@ export const getOrderStatus = async (orderId: number) => {
   const { data } = await api.get(`/orders/${orderId}`)
   return data
 }
+
+export async function getMyActiveOrders(customerId: number) {
+  // Fetches all orders for this user; we will filter for "active" ones in the UI
+  const res = await api.get(`/orders/customer/${customerId}`); // Adjust endpoint if you have /orders/user/{id}
+  return res.data;
+}

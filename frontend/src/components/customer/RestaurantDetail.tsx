@@ -93,7 +93,7 @@ export default function RestaurantDetail() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
                     />
                     <button 
-                      onClick={() => addItem(item)} // Add item to Zustand store
+                      onClick={() => addItem(item,Number(restaurantId))} // Add item to Zustand store
                       className="absolute bottom-2 right-2 bg-white p-1.5 rounded-full shadow-lg hover:bg-black hover:text-white transition-all border border-slate-100 active:scale-90"
                     >
                       <Plus size={20} />

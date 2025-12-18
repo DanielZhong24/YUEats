@@ -20,14 +20,10 @@ public class OrderStatusScheduler {
         this.statusMachine = statusMachine;
     }
 
-    /**
-     * Updates orders that are either pending or preparing to its next status
-     * (simulates preparing/cooking)
-     */
     @Scheduled(fixedRate = 60000)
     private void updateOrder() {
-        // 🚨 Only auto-complete orders that have already been STARTED by the chef
-        List<OrderStatus> statuses = List.of(OrderStatus.PREPARING);
+        // Add OrderStatus.PENDING to the list below ⬇️
+        List<OrderStatus> statuses = List.of(OrderStatus.PENDING, OrderStatus.PREPARING);
         List<Order> orders = orderRepository.findByStatusIn(statuses);
 
         for (Order order : orders) {

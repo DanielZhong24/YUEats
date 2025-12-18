@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import CustomerLayout from '@/components/customer/CustomerLayout'
-import CustomerDashboard from '@/components/customer/CustomerDashboard'
+import OrdersPage from '@/components/customer/OrdersPage'
 
-export const Route = createFileRoute('/customer/')({
+export const Route = createFileRoute('/customer/orders')({
   component: () => (
     <CustomerLayout>
-      <CustomerDashboard />
+      <OrdersPage />
     </CustomerLayout>
   ),
 })

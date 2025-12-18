@@ -66,4 +66,15 @@ public class OrderController {
             return ResponseEntity.ok(order);
         }).orElse(ResponseEntity.notFound().build());
     }
+
+    /**
+     * CUSTOMER DASHBOARD: Get all orders for a specific customer
+     * Use this to show the "Active Orders" tracking list in React
+     */
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<List<Order>> getCustomerOrders(@PathVariable Integer customerId) {
+        // Note: Ensure you have findByCustomerId in your OrderRepository
+        List<Order> orders = orderRepository.findByCustomerId(customerId);
+        return ResponseEntity.ok(orders);
+    }
 }

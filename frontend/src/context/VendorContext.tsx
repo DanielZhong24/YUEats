@@ -1,36 +1,48 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import * as vendorService from '@/services/vendor'
+import { useQuery } from '@tanstack/react-query'
 
-type VendorContextType = {
+interface VendorContextType {
   activeRestaurantId: number | null
-  setActiveRestaurantId: (id: number) => void
+  setActiveRestaurantId: (id: number | null) => void // Allow null
+  restaurants: any[]
+  isLoading: boolean
 }
 
-const VendorContext = createContext<VendorContextType | undefined>(undefined)
+export const VendorContext = createContext<VendorContextType | undefined>(undefined)
 
-export function VendorProvider({ children }: { children: ReactNode }) {
-  // 1. Initialize from LocalStorage so we don't lose selection on refresh
-  const [activeRestaurantId, setActiveRestaurantIdState] = useState<number | null>(() => {
-    const saved = localStorage.getItem('vendor_active_restaurant')
-    return saved ? parseInt(saved, 10) : null
+export function VendorProvider({ children }: { children: React.ReactNode }) {
+  const [activeRestaurantId, setActiveRestaurantId] = useState<number | null>(null)
+
+  const { data: restaurants = [], isLoading } = useQuery({
+    queryKey: ['my-restaurants'],
+    queryFn: vendorService.getMyRestaurants,
   })
 
-  // 2. Wrapper to save to LocalStorage whenever it changes
-  const setActiveRestaurantId = (id: number) => {
-    setActiveRestaurantIdState(id)
-    localStorage.setItem('vendor_active_restaurant', id.toString())
-  }
+  useEffect(() => {
+    // Only auto-select if there are actually restaurants available
+    if (restaurants.length > 0 && !activeRestaurantId) {
+      setActiveRestaurantId(restaurants[0].id)
+    }
+  }, [restaurants, activeRestaurantId])
 
   return (
-    <VendorContext.Provider value={{ activeRestaurantId, setActiveRestaurantId }}>
+    <VendorContext.Provider 
+      value={{ 
+        activeRestaurantId, 
+        setActiveRestaurantId, 
+        restaurants, 
+        isLoading 
+      }}
+    >
       {children}
     </VendorContext.Provider>
   )
 }
 
-// 3. Custom Hook for easy usage
 export function useVendorContext() {
   const context = useContext(VendorContext)
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useVendorContext must be used within a VendorProvider')
   }
   return context
