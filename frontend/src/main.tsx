@@ -4,6 +4,7 @@ import { RouterProvider } from '@tanstack/react-router'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 import { AuthProvider, useAuth } from './auth'
+import { ThemeProvider } from '@/components/theme-provider'
 import { router } from './router'
 
 import './styles.css'
@@ -24,9 +25,11 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <AuthProvider>
-        <TanStackQueryProvider.Provider {...TanStackQueryProvider.getContext()}>
-          <InnerApp />
-        </TanStackQueryProvider.Provider>
+        <ThemeProvider defaultTheme="system">
+          <TanStackQueryProvider.Provider {...TanStackQueryProvider.getContext()}>
+            <InnerApp />
+          </TanStackQueryProvider.Provider>
+        </ThemeProvider>
       </AuthProvider>
     </StrictMode>,
   )

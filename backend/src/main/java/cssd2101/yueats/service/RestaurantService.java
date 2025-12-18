@@ -16,7 +16,8 @@ public class RestaurantService {
     private final UserRepository userRepository;
     private final RestaurantBuilder restaurantBuilder;
 
-    public RestaurantService(RestaurantRepository restaurantRepository, UserRepository userRepository, RestaurantBuilder restaurantBuilder) {
+    public RestaurantService(RestaurantRepository restaurantRepository, UserRepository userRepository,
+            RestaurantBuilder restaurantBuilder) {
         this.restaurantRepository = restaurantRepository;
         this.userRepository = userRepository;
         this.restaurantBuilder = restaurantBuilder;
@@ -24,13 +25,14 @@ public class RestaurantService {
 
     /**
      * Create a restaurant
+     * 
      * @param req The information from the client
      * @return The restaurant that was created
      */
     public Restaurant createRestaurant(RestaurantCreationRequest req) {
         // Find the user from the ID passed into the request
-        User user = userRepository.findById(Long.valueOf(req.ownerId())).
-                orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(Long.valueOf(req.ownerId()))
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Check if they have the vendor role
         if (user.getUserRole() != UserRole.VENDOR) {
@@ -45,5 +47,12 @@ public class RestaurantService {
         Vendor vendor = (Vendor) user;
         Restaurant restaurant = restaurantBuilder.createRestaurant(req, vendor);
         return restaurantRepository.save(restaurant);
+    }
+
+    public void deleteRestaurant(Long id) {
+        if (!restaurantRepository.existsById(id)) {
+            throw new RuntimeException("Restaurant not found with ID: " + id);
+        }
+        restaurantRepository.deleteById(id);
     }
 }

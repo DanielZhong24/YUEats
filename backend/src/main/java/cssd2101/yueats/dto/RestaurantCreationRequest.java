@@ -19,6 +19,6 @@ public record RestaurantCreationRequest(
         String address,
 
         @NotBlank(groups=NotBlank.class, message = "Image url cannot be empty")
-        String banner_img_url
+        String bannerImgUrl
 )
 {}
