@@ -42,14 +42,14 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const VendorSignupIndexRoute = VendorSignupIndexRouteImport.update({
-  id: '/vendor/signup/',
-  path: '/vendor/signup/',
-  getParentRoute: () => rootRouteImport,
+  id: '/signup/',
+  path: '/signup/',
+  getParentRoute: () => VendorRouteRoute,
 } as any)
 const VendorLoginIndexRoute = VendorLoginIndexRouteImport.update({
-  id: '/vendor/login/',
-  path: '/vendor/login/',
-  getParentRoute: () => rootRouteImport,
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => VendorRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -111,8 +111,6 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   VendorIndexRoute: typeof VendorIndexRoute
-  VendorLoginIndexRoute: typeof VendorLoginIndexRoute
-  VendorSignupIndexRoute: typeof VendorSignupIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,17 +152,17 @@ declare module '@tanstack/react-router' {
     }
     '/vendor/signup/': {
       id: '/vendor/signup/'
-      path: '/vendor/signup'
+      path: '/signup'
       fullPath: '/vendor/signup'
       preLoaderRoute: typeof VendorSignupIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof VendorRouteRoute
     }
     '/vendor/login/': {
       id: '/vendor/login/'
-      path: '/vendor/login'
+      path: '/login'
       fullPath: '/vendor/login'
       preLoaderRoute: typeof VendorLoginIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof VendorRouteRoute
     }
   }
 }
@@ -186,8 +184,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   VendorIndexRoute: VendorIndexRoute,
-  VendorLoginIndexRoute: VendorLoginIndexRoute,
-  VendorSignupIndexRoute: VendorSignupIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
