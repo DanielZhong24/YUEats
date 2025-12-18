@@ -30,6 +30,13 @@ public class RestaurantController {
         this.menuItemService = menuItemService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<Restaurant>> getAllRestaurants() {
+        // Assuming your restaurantService has a method to find all
+        List<Restaurant> restaurants = restaurantService.getAllRestaurants();
+        return ResponseEntity.ok(restaurants);
+    }
+
     /**
      * Create a restaurant as a vendor
      * 

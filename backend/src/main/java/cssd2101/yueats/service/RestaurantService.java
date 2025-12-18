@@ -10,6 +10,8 @@ import cssd2101.yueats.repository.UserRepository;
 import cssd2101.yueats.types.UserRole;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
@@ -54,5 +56,9 @@ public class RestaurantService {
             throw new RuntimeException("Restaurant not found with ID: " + id);
         }
         restaurantRepository.deleteById(id);
+    }
+
+    public List<Restaurant> getAllRestaurants() {
+        return restaurantRepository.findAll();
     }
 }

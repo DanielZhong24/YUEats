@@ -1,43 +1,46 @@
 import axios from 'axios';
 
+// Instance configured to match your Vendor service
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
-    withCredentials: true, // Sends cookies/session headers with every request
+  baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 /**
- * RESTAURANT & MENU SERVICES
- * Based on RestaurantController.java
+ * Get all orders for the current customer (GET /orders/user/:userId)
+ *
  */
-export const getRestaurants = async () => {
-  const { data } = await api.get('/restaurants');
-  return data;
-};
-
-export const getRestaurantMenu = async (restaurantId: number) => {
-  const { data } = await api.get(`/restaurants/${restaurantId}/menu-items`);
-  return data;
-};
+export async function getCustomerOrders(userId: number) {
+  const res = await api.get(`/orders/user/${userId}`);
+  return res.data;
+}
 
 /**
- * ORDER SERVICES
- * Based on OrderController.java
+ * Get details for a single order (GET /orders/:orderId)
+ *
  */
-export const getCustomerOrders = async (userId: number) => {
-  // Matches the logic required for the Customer Dashboard
-  const { data } = await api.get(`/orders/user/${userId}`);
-  return data;
-};
+export async function getOrderById(orderId: number) {
+  const res = await api.get(`/orders/${orderId}`);
+  return res.data;
+}
 
-export const createOrder = async (orderData: any) => {
-  const { data } = await api.post('/orders', orderData);
-  return data;
-};
+/**
+ * Get all restaurants for the customer to browse (GET /restaurants)
+ *
+ */
+export async function getRestaurants() {
+  const res = await api.get('/restaurants');
+  return res.data;
+}
 
-export const getOrderStatus = async (orderId: number) => {
-  const { data } = await api.get(`/orders/${orderId}`);
-  return data;
-};
+/**
+ * Get the menu items for a selected restaurant (GET /restaurants/:id/menu-items)
+ *
+ */
+export async function getRestaurantMenu(restaurantId: number | string) {
+  const res = await api.get(`/restaurants/${restaurantId}/menu-items`);
+  return res.data;
+}

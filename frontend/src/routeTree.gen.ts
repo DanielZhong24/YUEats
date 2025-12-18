@@ -12,14 +12,19 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as VendorRouteRouteImport } from './routes/vendor/route'
+import { Route as CustomerRouteRouteImport } from './routes/customer/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VendorIndexRouteImport } from './routes/vendor/index'
+import { Route as CustomerIndexRouteImport } from './routes/customer/index'
 import { Route as VendorSettingsRouteImport } from './routes/vendor/settings'
 import { Route as VendorPrepRouteImport } from './routes/vendor/prep'
 import { Route as VendorMenuRouteImport } from './routes/vendor/menu'
+import { Route as CustomerDashboardRouteImport } from './routes/customer/dashboard'
+import { Route as CustomerCheckoutRouteImport } from './routes/customer/checkout'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as VendorSignupIndexRouteImport } from './routes/vendor/signup/index'
 import { Route as VendorLoginIndexRouteImport } from './routes/vendor/login/index'
+import { Route as CustomerRestaurantRestaurantIdRouteImport } from './routes/customer/restaurant.$restaurantId'
 import { Route as VendorRestaurantsCreateIndexRouteImport } from './routes/vendor/restaurants/create/index'
 
 const LoginRoute = LoginRouteImport.update({
@@ -36,6 +41,11 @@ const VendorRouteRoute = VendorRouteRouteImport.update({
   path: '/vendor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomerRouteRoute = CustomerRouteRouteImport.update({
+  id: '/customer',
+  path: '/customer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -45,6 +55,11 @@ const VendorIndexRoute = VendorIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => VendorRouteRoute,
+} as any)
+const CustomerIndexRoute = CustomerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CustomerRouteRoute,
 } as any)
 const VendorSettingsRoute = VendorSettingsRouteImport.update({
   id: '/settings',
@@ -61,6 +76,16 @@ const VendorMenuRoute = VendorMenuRouteImport.update({
   path: '/menu',
   getParentRoute: () => VendorRouteRoute,
 } as any)
+const CustomerDashboardRoute = CustomerDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => CustomerRouteRoute,
+} as any)
+const CustomerCheckoutRoute = CustomerCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => CustomerRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -76,6 +101,12 @@ const VendorLoginIndexRoute = VendorLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => VendorRouteRoute,
 } as any)
+const CustomerRestaurantRestaurantIdRoute =
+  CustomerRestaurantRestaurantIdRouteImport.update({
+    id: '/restaurant/$restaurantId',
+    path: '/restaurant/$restaurantId',
+    getParentRoute: () => CustomerRouteRoute,
+  } as any)
 const VendorRestaurantsCreateIndexRoute =
   VendorRestaurantsCreateIndexRouteImport.update({
     id: '/restaurants/create/',
@@ -85,13 +116,18 @@ const VendorRestaurantsCreateIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/customer': typeof CustomerRouteRouteWithChildren
   '/vendor': typeof VendorRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/customer/checkout': typeof CustomerCheckoutRoute
+  '/customer/dashboard': typeof CustomerDashboardRoute
   '/vendor/menu': typeof VendorMenuRoute
   '/vendor/prep': typeof VendorPrepRoute
   '/vendor/settings': typeof VendorSettingsRoute
+  '/customer/': typeof CustomerIndexRoute
   '/vendor/': typeof VendorIndexRoute
+  '/customer/restaurant/$restaurantId': typeof CustomerRestaurantRestaurantIdRoute
   '/vendor/login': typeof VendorLoginIndexRoute
   '/vendor/signup': typeof VendorSignupIndexRoute
   '/vendor/restaurants/create': typeof VendorRestaurantsCreateIndexRoute
@@ -100,10 +136,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/customer/checkout': typeof CustomerCheckoutRoute
+  '/customer/dashboard': typeof CustomerDashboardRoute
   '/vendor/menu': typeof VendorMenuRoute
   '/vendor/prep': typeof VendorPrepRoute
   '/vendor/settings': typeof VendorSettingsRoute
+  '/customer': typeof CustomerIndexRoute
   '/vendor': typeof VendorIndexRoute
+  '/customer/restaurant/$restaurantId': typeof CustomerRestaurantRestaurantIdRoute
   '/vendor/login': typeof VendorLoginIndexRoute
   '/vendor/signup': typeof VendorSignupIndexRoute
   '/vendor/restaurants/create': typeof VendorRestaurantsCreateIndexRoute
@@ -111,14 +151,19 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/customer': typeof CustomerRouteRouteWithChildren
   '/vendor': typeof VendorRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/customer/checkout': typeof CustomerCheckoutRoute
+  '/customer/dashboard': typeof CustomerDashboardRoute
   '/vendor/menu': typeof VendorMenuRoute
   '/vendor/prep': typeof VendorPrepRoute
   '/vendor/settings': typeof VendorSettingsRoute
+  '/customer/': typeof CustomerIndexRoute
   '/vendor/': typeof VendorIndexRoute
+  '/customer/restaurant/$restaurantId': typeof CustomerRestaurantRestaurantIdRoute
   '/vendor/login/': typeof VendorLoginIndexRoute
   '/vendor/signup/': typeof VendorSignupIndexRoute
   '/vendor/restaurants/create/': typeof VendorRestaurantsCreateIndexRoute
@@ -127,13 +172,18 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/customer'
     | '/vendor'
     | '/login'
     | '/dashboard'
+    | '/customer/checkout'
+    | '/customer/dashboard'
     | '/vendor/menu'
     | '/vendor/prep'
     | '/vendor/settings'
+    | '/customer/'
     | '/vendor/'
+    | '/customer/restaurant/$restaurantId'
     | '/vendor/login'
     | '/vendor/signup'
     | '/vendor/restaurants/create'
@@ -142,24 +192,33 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard'
+    | '/customer/checkout'
+    | '/customer/dashboard'
     | '/vendor/menu'
     | '/vendor/prep'
     | '/vendor/settings'
+    | '/customer'
     | '/vendor'
+    | '/customer/restaurant/$restaurantId'
     | '/vendor/login'
     | '/vendor/signup'
     | '/vendor/restaurants/create'
   id:
     | '__root__'
     | '/'
+    | '/customer'
     | '/vendor'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/dashboard'
+    | '/customer/checkout'
+    | '/customer/dashboard'
     | '/vendor/menu'
     | '/vendor/prep'
     | '/vendor/settings'
+    | '/customer/'
     | '/vendor/'
+    | '/customer/restaurant/$restaurantId'
     | '/vendor/login/'
     | '/vendor/signup/'
     | '/vendor/restaurants/create/'
@@ -167,6 +226,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CustomerRouteRoute: typeof CustomerRouteRouteWithChildren
   VendorRouteRoute: typeof VendorRouteRouteWithChildren
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
@@ -195,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/customer': {
+      id: '/customer'
+      path: '/customer'
+      fullPath: '/customer'
+      preLoaderRoute: typeof CustomerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -208,6 +275,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/vendor/'
       preLoaderRoute: typeof VendorIndexRouteImport
       parentRoute: typeof VendorRouteRoute
+    }
+    '/customer/': {
+      id: '/customer/'
+      path: '/'
+      fullPath: '/customer/'
+      preLoaderRoute: typeof CustomerIndexRouteImport
+      parentRoute: typeof CustomerRouteRoute
     }
     '/vendor/settings': {
       id: '/vendor/settings'
@@ -230,6 +304,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorMenuRouteImport
       parentRoute: typeof VendorRouteRoute
     }
+    '/customer/dashboard': {
+      id: '/customer/dashboard'
+      path: '/dashboard'
+      fullPath: '/customer/dashboard'
+      preLoaderRoute: typeof CustomerDashboardRouteImport
+      parentRoute: typeof CustomerRouteRoute
+    }
+    '/customer/checkout': {
+      id: '/customer/checkout'
+      path: '/checkout'
+      fullPath: '/customer/checkout'
+      preLoaderRoute: typeof CustomerCheckoutRouteImport
+      parentRoute: typeof CustomerRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -251,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorLoginIndexRouteImport
       parentRoute: typeof VendorRouteRoute
     }
+    '/customer/restaurant/$restaurantId': {
+      id: '/customer/restaurant/$restaurantId'
+      path: '/restaurant/$restaurantId'
+      fullPath: '/customer/restaurant/$restaurantId'
+      preLoaderRoute: typeof CustomerRestaurantRestaurantIdRouteImport
+      parentRoute: typeof CustomerRouteRoute
+    }
     '/vendor/restaurants/create/': {
       id: '/vendor/restaurants/create/'
       path: '/restaurants/create'
@@ -260,6 +355,24 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface CustomerRouteRouteChildren {
+  CustomerCheckoutRoute: typeof CustomerCheckoutRoute
+  CustomerDashboardRoute: typeof CustomerDashboardRoute
+  CustomerIndexRoute: typeof CustomerIndexRoute
+  CustomerRestaurantRestaurantIdRoute: typeof CustomerRestaurantRestaurantIdRoute
+}
+
+const CustomerRouteRouteChildren: CustomerRouteRouteChildren = {
+  CustomerCheckoutRoute: CustomerCheckoutRoute,
+  CustomerDashboardRoute: CustomerDashboardRoute,
+  CustomerIndexRoute: CustomerIndexRoute,
+  CustomerRestaurantRestaurantIdRoute: CustomerRestaurantRestaurantIdRoute,
+}
+
+const CustomerRouteRouteWithChildren = CustomerRouteRoute._addFileChildren(
+  CustomerRouteRouteChildren,
+)
 
 interface VendorRouteRouteChildren {
   VendorMenuRoute: typeof VendorMenuRoute
@@ -299,6 +412,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CustomerRouteRoute: CustomerRouteRouteWithChildren,
   VendorRouteRoute: VendorRouteRouteWithChildren,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
