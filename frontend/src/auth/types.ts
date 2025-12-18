@@ -37,6 +37,12 @@ export interface Restaurant {
   address: string
 }
 
+// Login Request Interface
+export interface LoginPayload {
+  email: string
+  password: string
+}
+
 // Signup Request Interfaces
 export interface SignupPayload {
   firstName: string

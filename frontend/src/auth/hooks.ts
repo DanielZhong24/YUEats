@@ -6,6 +6,7 @@ import type {
   SignupPayload,
   VendorSignupPayload,
   SignupResponse,
+  LoginPayload,
 } from './types'
 
 const checkBackendUrl = () => {
@@ -41,14 +42,11 @@ const signupApi = async (
   return response.json()
 }
 
-const loginApi = async (
-  username: string,
-  password: string,
-): Promise<AppUser> => {
+const loginApi = async (payload: LoginPayload): Promise<AppUser> => {
   checkBackendUrl()
   const formData = new URLSearchParams()
-  formData.append('username', username)
-  formData.append('password', password)
+  formData.append('username', payload.email)
+  formData.append('password', payload.password)
 
   const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/login`, {
     method: 'POST',
@@ -101,10 +99,10 @@ export function useSignupMutation() {
     onSuccess: async (_data, variables) => {
       // Auto-login after successful signup
       try {
-        const userData = await loginApi(
-          variables.payload.email,
-          variables.payload.password,
-        )
+        const userData = await loginApi({
+          email: variables.payload.email,
+          password: variables.payload.password,
+        })
         setUser(userData)
         setIsAuthenticated(true)
         queryClient.invalidateQueries({ queryKey: ['user'] })
@@ -122,13 +120,7 @@ export function useLoginMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({
-      username,
-      password,
-    }: {
-      username: string
-      password: string
-    }) => loginApi(username, password),
+    mutationFn: (payload: LoginPayload) => loginApi(payload),
     onSuccess: (userData) => {
       setUser(userData)
       setIsAuthenticated(true)
@@ -148,17 +140,7 @@ export function useLogoutMutation() {
       setIsAuthenticated(false)
       queryClient.clear()
 
-      if (router.state.location.pathname === '/auth') {
-        router.navigate({
-          to: '/auths',
-          search: { redirect: '/' },
-        })
-      } else {
-        router.navigate({
-          to: '/auths',
-          search: { redirect: router.state.location.pathname },
-        })
-      }
+      router.navigate({ to: '/auths', search: { redirect: '/' } })
     },
   })
 }
