@@ -43,7 +43,7 @@ public class Order {
     private String deliveryAddress;
 
     @ManyToOne
-    @JoinColumn(name = "courier_id")
+    @JoinColumn(name = "driver_id")
     private DeliveryCourier courier;
 
     @Column(length = 10)

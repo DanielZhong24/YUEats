@@ -5,19 +5,23 @@ import {
   BarChart3, 
   Timer,
   Settings,
-  HelpCircle
+  HelpCircle,
+  LogOut
 } from 'lucide-react'
+import { useLogoutMutation } from '@/auth/hooks'
 
 // Helper to center icons (Simplified)
 function Icon({ children }: { children: React.ReactNode }) {
   return (
-    <span className="w-6 h-6 inline-flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+    <span className="w-6 h-6 inline-flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
       {children}
     </span>
   )
 }
 
 export default function Sidebar() {
+  const logoutMutation = useLogoutMutation()
+  
   return (
     <aside className="w-64 min-h-screen bg-white dark:bg-slate-800 border-r dark:border-slate-700 p-6 shadow-sm flex flex-col h-full">
       <div className="mb-8">
@@ -78,9 +82,16 @@ export default function Sidebar() {
           <span>Settings</span>
         </Link>
 
+     
+  
         <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 group text-sm">
           <Icon><HelpCircle size={18} /></Icon>
           <span>Help Center</span>
+        </button>
+        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 group text-sm"
+          onClick={()=>logoutMutation.mutate()}>
+          <Icon><LogOut size={18} /></Icon>
+          <span>Log Out</span>
         </button>
       </div>
     </aside>

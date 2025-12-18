@@ -31,23 +31,14 @@ public class OrderService {
         this.restaurantRepository = restRepo;
     }
 
-    /**
-     * Create an order by customer
-     * 
-     * @param request The request sent from the client containing information to
-     *                create an order
-     * @return The order saved in the database
-     */
     @Transactional
     public Order createOrder(OrderCreationRequest request) {
-
         User customer = userRepository.findById(Long.valueOf(request.customerId()))
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         Restaurant restaurant = restaurantRepository.findById(Long.valueOf(request.restaurantId()))
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
-        // Manually create order with the information
         Order order = new Order();
         order.setCustomer(customer);
         order.setRestaurant(restaurant);
@@ -58,114 +49,83 @@ public class OrderService {
         BigDecimal calculatedTotal = BigDecimal.ZERO;
         List<OrderDetail> detailsList = new ArrayList<>();
 
-        // Search for items
         for (OrderItemRequest itemDTO : request.items()) {
             MenuItem dbItem = menuItemRepository.findById(Long.valueOf(itemDTO.menuItemId()))
                     .orElseThrow(() -> new RuntimeException("Menu item not found"));
 
-            if (!dbItem.getRestaurant().getId().equals(restaurant.getId())) {
-                throw new RuntimeException("Item " + dbItem.getItemName() + " is not from this restaurant");
-            }
-
-            // Manually create order details with the information
             OrderDetail detail = new OrderDetail();
             detail.setOrder(order);
             detail.setMenuItem(dbItem);
             detail.setQuantity(itemDTO.quantity());
             detail.setPriceAtPurchase(dbItem.getPrice());
 
-            BigDecimal lineTotal = dbItem.getPrice().multiply(BigDecimal.valueOf(itemDTO.quantity()));
-            calculatedTotal = calculatedTotal.add(lineTotal);
-
+            calculatedTotal = calculatedTotal.add(dbItem.getPrice().multiply(BigDecimal.valueOf(itemDTO.quantity())));
             detailsList.add(detail);
         }
 
-        // Set the price, details and save to database
         order.setTotalPrice(calculatedTotal);
-        order.setOrderDetails(detailsList); // Cascade will save these automatically
-
+        order.setOrderDetails(detailsList);
         return orderRepository.save(order);
     }
 
-    /**
-     * Verify that the order has been picked up by the courier
-     * 
-     * @param orderId The order ID
-     * @param code    The pickup code
-     * @param email   The courier's email
-     */
-    public void verifyPickup(Integer orderId, String code, String email) {
+    @Transactional
+    public Order claimOrder(Integer orderId, String email) {
         Order order = orderRepository.findById(Long.valueOf(orderId))
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
-        if (order.getStatus() != OrderStatus.PICKED_UP) {
-            throw new IllegalStateException("Order was not chosen by the delivery courier");
+        if (order.getStatus() != OrderStatus.READY_FOR_PICKUP) {
+            throw new IllegalStateException("Order is not ready for collection");
         }
 
-        if (!order.getPickupCode().equals(code)) {
-            throw new IllegalStateException("Order code is incorrect");
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        order.setCourier((DeliveryCourier) user);
+        order.setStatus(OrderStatus.PICKED_UP);
+        order.setLastUpdated(LocalDateTime.now());
+        return orderRepository.save(order);
+    }
+
+    @Transactional
+    public void vendorVerifyPickup(Integer orderId, String code, String vendorEmail) {
+        Order order = orderRepository.findById(Long.valueOf(orderId))
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        if (!order.getRestaurant().getOwner().getEmail().equals(vendorEmail)) {
+            throw new IllegalStateException("You are not authorized to verify this order.");
         }
 
-        if (!order.getCourier().getEmail().equals(email)) {
-            throw new IllegalStateException("This order is not assigned to you");
+        if (order.getPickupCode() == null || !order.getPickupCode().equalsIgnoreCase(code)) {
+            throw new IllegalStateException(
+                    "Invalid pickup code. Expected: " + order.getPickupCode() + ", Received: " + code);
         }
 
-        // If it passes the previous checks, set the status to in transit
-        // Update the order in the database
         order.setStatus(OrderStatus.IN_TRANSIT);
         order.setLastUpdated(LocalDateTime.now());
         orderRepository.save(order);
     }
 
-    /**
-     * Get all orders with the ready for pickup status
-     * 
-     * @param userDetails The logged in delivery couriers details
-     * @return List of orders that have the ready for pickup status
-     */
     public List<Order> getReadyOrders(UserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        DeliveryCourier courier = (DeliveryCourier) user;
-        if (courier.getUserRole() != UserRole.COURIER) {
-            throw new IllegalStateException("Only couriers can be picked up");
-        }
         return orderRepository.findByStatus(OrderStatus.READY_FOR_PICKUP);
     }
 
-    /**
-     * Claim an order
-     * 
-     * @param orderId The order ID
-     * @param email   The delivery courier's email
-     * @return The order that was claimed
-     */
     @Transactional
-    public Order claimOrder(Integer orderId, String email) {
-        if (orderId == null) {
-            throw new NullPointerException("Order id is null");
-        }
-
-        // Find order by the given id
-        Order order = orderRepository.findById(Long.valueOf(orderId))
+    public void cancelOrder(Long orderId, String customerEmail) {
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
-        if (order.getStatus() != OrderStatus.READY_FOR_PICKUP) {
-            throw new IllegalStateException("Order status is not ready yet");
+        // Only allow cancellation if the order belongs to the customer
+        if (!order.getCustomer().getEmail().equals(customerEmail)) {
+            throw new IllegalStateException("Unauthorized: This is not your order");
         }
-        // Find user with the given email
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Convert type to delivery courier
-        DeliveryCourier courier = (DeliveryCourier) user;
+        // Only allow cancellation before the kitchen starts preparing
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalStateException("Order cannot be cancelled once preparation has started.");
+        }
 
-        // Update order details with courier, new status
-        order.setCourier(courier);
-        order.setStatus(OrderStatus.PICKED_UP);
+        order.setStatus(OrderStatus.CANCELLED);
         order.setLastUpdated(LocalDateTime.now());
-
         orderRepository.save(order);
-        return order;
     }
 }

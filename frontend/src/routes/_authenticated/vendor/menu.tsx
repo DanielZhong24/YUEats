@@ -111,7 +111,7 @@ function MenuPage() {
   if (isLoadingRestaurants || (activeRestaurantId && isLoadingMenu)) {
     return (
       <div className="flex h-[50vh] items-center justify-center flex-col gap-4 text-slate-500">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
+        <Loader2 className="animate-spin text-red-600" size={40} />
         <p className="animate-pulse">Loading your menu...</p>
       </div>
     )
@@ -122,14 +122,14 @@ function MenuPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Utensils className="text-blue-500" size={24} />
+            <Utensils className="text-red-500" size={24} />
             Menu: {activeRestaurant?.restaurantName || 'Select a Restaurant'}
           </h1>
         </div>
         
         <button 
           onClick={handleAddNew}
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm active:scale-95"
+          className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm active:scale-95"
         >
           <Plus size={20} /> Add New Dish
         </button>
@@ -144,14 +144,14 @@ function MenuPage() {
             placeholder="Search dishes..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-red-500 outline-none transition-all"
           />
         </div>
         <div className="relative min-w-[200px]">
           <select 
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="w-full pl-4 pr-10 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white appearance-none cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full pl-4 pr-10 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white appearance-none cursor-pointer focus:ring-2 focus:ring-red-500 outline-none"
           >
             {categories.map((cat: string) => <option key={cat} value={cat}>{cat}</option>)}
           </select>
@@ -211,7 +211,7 @@ function MenuPage() {
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={() => handleEdit(item)} 
-                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
                         >
                           <Edit2 size={18} />
                         </button>
@@ -231,7 +231,7 @@ function MenuPage() {
                     <div className="flex flex-col items-center gap-3 text-slate-400">
                       <Utensils size={48} className="opacity-10" />
                       <p className="text-lg font-medium">No menu items found</p>
-                      <button onClick={handleAddNew} className="text-blue-500 hover:underline text-sm font-bold">Add your first dish</button>
+                      <button onClick={handleAddNew} className="text-red-500 hover:underline text-sm font-bold">Add your first dish</button>
                     </div>
                   </td>
                 </tr>

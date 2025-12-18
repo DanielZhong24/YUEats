@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 export const Route = createFileRoute('/auth')({
   validateSearch: (search) => ({
     redirect: (search.redirect as string) || '/',
+    mode:(search.mode as 'login'|'signup')||'login'
   }),
   beforeLoad: ({ context, search }) => {
     // Redirect if already authenticated
@@ -24,6 +25,7 @@ export const Route = createFileRoute('/auth')({
 })
 
 function AuthPage() {
+  const {mode} = Route.useSearch()
   const router = useRouter()
   const signupMutation = useSignupMutation()
   const loginMutation = useLoginMutation()
@@ -56,9 +58,12 @@ function AuthPage() {
           })
           // Navigate based on user type
           if (userRole === 'VENDOR') {
-            router.navigate({ to: '/dashboard' })
-          } else {
-            router.navigate({ to: '/' })
+            router.navigate({ to: '/vendor' })
+          } else if(userRole === 'COURIER') {
+            router.navigate({ to: '/courier' })
+          }else{
+            router.navigate({ to: '/customer' })
+
           }
         },
         onError: (error) => {
@@ -78,10 +83,14 @@ function AuthPage() {
         })
         // Navigate based on user role
         if (userData.userRole === 'VENDOR') {
-          router.navigate({ to: '/dashboard' })
+          router.navigate({ to: '/vendor' })
+        }else if(userData.userRole === 'COURIER'){
+          router.navigate({to: '/courier'})
         } else {
-          router.navigate({ to: '/' })
+          router.navigate({ to: '/customer' })
         }
+
+
       },
       onError: (error) => {
         toast.error('Login failed!', {
@@ -95,6 +104,7 @@ function AuthPage() {
     <div className="flex flex-col items-center justify-center gap-6 p-6 bg-muted min-h-svh md:p-10">
       <div className="flex flex-col w-full max-w-sm gap-6">
         <AuthCard
+          defaultMode={mode}
           onSignup={handleSignup}
           onLogin={handleLogin}
           isPending={signupMutation.isPending || loginMutation.isPending}

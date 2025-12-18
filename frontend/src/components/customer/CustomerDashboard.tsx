@@ -1,7 +1,6 @@
 import { useRestaurants } from '@/hooks/useCustomerApi'
-import { Link } from '@tanstack/react-router' // 👈 Import Link
-import { Star, Clock } from 'lucide-react'
-import LiveOrderStatus from './LiveOrderStatus';
+import { Link } from '@tanstack/react-router' 
+import { Clock } from 'lucide-react'
 export default function CustomerDashboard() {
   const { data: restaurants, isLoading } = useRestaurants()
   const restaurantList = Array.isArray(restaurants) ? restaurants : []
@@ -12,7 +11,6 @@ export default function CustomerDashboard() {
     
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {restaurantList.map((rest: any) => (
-          // 👈 Wrap the card in a Link pointing to the restaurant ID
           <Link 
             key={rest.id} 
             to="/customer/restaurant/$restaurantId" 

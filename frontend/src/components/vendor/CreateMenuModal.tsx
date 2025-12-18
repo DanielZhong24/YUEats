@@ -184,7 +184,7 @@ export default function CreateMenuModal({ isOpen, onClose, restaurantId, editIte
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 dark:text-slate-300">Price ($)</label>
-                <input required type="number" step="any" placeholder="0.00" className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white"
+                <input required type="number" step="any" placeholder="0.00" min="0"className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white"
                   value={formData.price}
                   onChange={e => setFormData({...formData, price: e.target.value})}
                 />
@@ -214,7 +214,7 @@ export default function CreateMenuModal({ isOpen, onClose, restaurantId, editIte
             type="submit" 
             form="menu-item-form"
             disabled={isPending || isUploading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition-all disabled:opacity-50 flex justify-center items-center gap-2"
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition-all disabled:opacity-50 flex justify-center items-center gap-2"
           >
             {(isPending || isUploading) && <Loader2 className="animate-spin" size={18} />}
             {isUploading ? 'Uploading...' : isEditMode ? 'Update Item' : 'Create Item'}

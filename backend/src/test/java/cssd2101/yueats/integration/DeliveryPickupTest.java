@@ -95,7 +95,7 @@ public class DeliveryPickupTest {
 
                 // 2. Create Restaurant
                 RestaurantCreationRequest restDto = new RestaurantCreationRequest("Pizza Pizza", vendor.getId(),
-                                "123 Pizza St");
+                                "123 Pizza St","http://image.url");
                 mockMvc.perform(post("/restaurants")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(restDto)))
@@ -103,13 +103,13 @@ public class DeliveryPickupTest {
 
                 restaurant = restaurantRepository.findByRestaurantName("Pizza Pizza").orElseThrow();
 
-                MenuItemCreationRequest item1 = new MenuItemCreationRequest("Pizza", "Cheese Pizza", 10.00);
+                MenuItemCreationRequest item1 = new MenuItemCreationRequest("Pizza", "Cheese Pizza", 10.00,"http://image.url","Main",true);
                 mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(item1)))
                                 .andExpect(status().isCreated());
 
-                MenuItemCreationRequest item2 = new MenuItemCreationRequest("Onion Rings", "Salty onion rings", 5.00);
+                MenuItemCreationRequest item2 = new MenuItemCreationRequest("Onion Rings", "Salty onion rings", 5.00,"http://image.url","Main",true);
                 mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(item2)))

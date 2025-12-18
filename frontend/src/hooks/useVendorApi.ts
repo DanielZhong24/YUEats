@@ -4,6 +4,9 @@ import { toast } from 'sonner';
 
 // --- Restaurant Hooks ---
 
+/**
+ * Fetch all restaurants owned by the current vendor.
+ */
 export function useMyRestaurants() {
   return useQuery({
     queryKey: ['vendor', 'my-restaurants'],
@@ -13,12 +16,16 @@ export function useMyRestaurants() {
   })
 }
 
+/**
+ * Hook to register a new restaurant.
+ */
 export function useCreateRestaurant() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (payload: vendorApi.RestaurantCreationRequest) => vendorApi.createRestaurant(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['vendor', 'my-restaurants'] })
+      toast.success("Restaurant created successfully");
     },
   })
 }
@@ -37,7 +44,6 @@ export function useDeleteRestaurant() {
   });
 }
 
-// --- Menu Hooks ---
 
 export function useRestaurantMenu(restaurantId: number | string) {
   return useQuery({
@@ -47,6 +53,7 @@ export function useRestaurantMenu(restaurantId: number | string) {
   })
 }
 
+
 export function useCreateMenuItem() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -54,11 +61,12 @@ export function useCreateMenuItem() {
       vendorApi.createMenuItem(vars),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['vendor', 'menu', variables.restaurantId] })
+      toast.success("Item added to menu");
     }
   })
 }
 
-// 🚨 ADDED BACK: Update Hook
+
 export function useUpdateMenuItem() {
   const qc = useQueryClient()
   return useMutation({
@@ -71,7 +79,6 @@ export function useUpdateMenuItem() {
   })
 }
 
-// 🚨 ADDED BACK: Delete Hook
 export function useDeleteMenuItem() {
   const qc = useQueryClient()
   return useMutation({
@@ -84,15 +91,12 @@ export function useDeleteMenuItem() {
   })
 }
 
-// --- Order Simulation Hooks ---
-
 export function useRestaurantOrders(restaurantId: number | string) {
   return useQuery({
     queryKey: ['vendor', 'orders', restaurantId],
     queryFn: async () => {
       try {
         const data = await vendorApi.getRestaurantOrders(restaurantId);
-        console.log("Order Data Received:", data); // 👈 Debugging log
         return data;
       } catch (error: any) {
         console.error("API Error:", error.response?.data || error.message);
@@ -103,6 +107,24 @@ export function useRestaurantOrders(restaurantId: number | string) {
     refetchInterval: 5000, 
   });
 }
+
+export function useVerifyDriverCode() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, code }: { orderId: number; code: string }) => 
+      vendorApi.verifyDriverCode(orderId, code),
+    onSuccess: () => {
+      // Refresh kitchen orders so the verified order "disappears" to In Transit
+      queryClient.invalidateQueries({ queryKey: ['vendor', 'orders'] });
+      toast.success("Handover confirmed! Order is now in transit.");
+    },
+    onError: (err: any) => {
+      const msg = err.response?.data?.message || "Invalid pickup code. Check driver's phone.";
+      toast.error("Verification Failed", { description: msg });
+    }
+  });
+}
+
 
 export function useStartPreparation() {
   const queryClient = useQueryClient();
@@ -115,16 +137,17 @@ export function useStartPreparation() {
   });
 }
 
+
 export function usePickupOrder() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (orderId: number) => vendorApi.simulatePickup(orderId),
     onSuccess: (_, orderId) => {
       queryClient.invalidateQueries({ queryKey: ['vendor', 'orders'] });
-      toast.success(`Order #${orderId} picked up!`);
+      toast.success(`Order #${orderId} marked as picked up.`);
     },
     onError: (err: any) => {
-      toast.error("Pickup failed", { description: err.message });
+      toast.error("Action failed", { description: err.message });
     }
   });
 }

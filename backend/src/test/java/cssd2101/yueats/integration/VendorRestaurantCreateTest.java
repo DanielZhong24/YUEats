@@ -86,12 +86,12 @@ public class VendorRestaurantCreateTest {
         User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new RuntimeException("User not found"));
         Vendor vendor = (Vendor) user;
 
-        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
+        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street","http://image.url");
 
         mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restaurantDto))).andExpect(status().isCreated());
 
-        RestaurantCreationRequest restaurantDto2 = new RestaurantCreationRequest("popeyes", vendor.getId(), "345 down street");
+        RestaurantCreationRequest restaurantDto2 = new RestaurantCreationRequest("popeyes", vendor.getId(), "345 down street","http://image.url");
         mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restaurantDto2))).andExpect(status().isCreated());
 
@@ -107,7 +107,7 @@ public class VendorRestaurantCreateTest {
 
         User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new RuntimeException("User not found"));
 
-        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", user.getId(), "123 fake street");
+        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", user.getId(), "123 fake street","http://image.url");
         mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(restaurantDto)))
                 .andExpect(status().isBadRequest())
@@ -116,7 +116,7 @@ public class VendorRestaurantCreateTest {
 
     @Test
     void createRestaurantNoUser() throws Exception {
-        RestaurantCreationRequest dto = new RestaurantCreationRequest("five guys", 4, "123 fake street");
+        RestaurantCreationRequest dto = new RestaurantCreationRequest("five guys", 4, "123 fake street","http://image.url");
         mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())
                 .andDo(print())
@@ -135,14 +135,14 @@ public class VendorRestaurantCreateTest {
 
         User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new RuntimeException("User not found"));
         Vendor vendor = (Vendor) user;
-        RestaurantCreationRequest dto1 = new RestaurantCreationRequest("", vendor.getId(), "123 fake street");
+        RestaurantCreationRequest dto1 = new RestaurantCreationRequest("", vendor.getId(), "123 fake street","http://image.url");
 
         mockMvc.perform(post("/restaurants")
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto1)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.restaurantName").value("Restaurant name is mandatory"));
 
-        RestaurantCreationRequest dto2 = new RestaurantCreationRequest("testing restaurant", vendor.getId(), "");
+        RestaurantCreationRequest dto2 = new RestaurantCreationRequest("testing restaurant", vendor.getId(), "","http://image.url");
 
         mockMvc.perform(post("/restaurants")
                         .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto2)))
@@ -165,12 +165,12 @@ public class VendorRestaurantCreateTest {
         User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new RuntimeException("User not found"));
         Vendor vendor = (Vendor) user;
 
-        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
+        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street","http://image.url");
 
         mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restaurantDto))).andExpect(status().isCreated());
 
-        RestaurantCreationRequest dupe = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
+        RestaurantCreationRequest dupe = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street","http://image.url");
         mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dupe)))
                 .andExpect(status().isBadRequest())

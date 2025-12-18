@@ -6,11 +6,17 @@ import { redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/vendor')({
   beforeLoad: ({ context }) => {
+    // 1. First check: Is anyone logged in?
     if (!context.auth.isAuthenticated) {
       throw redirect({
         to: '/auth',
         search: { redirect: window.location.pathname },
       })
+    }
+
+    // 2. Second check: Is this user a VENDOR?
+    if (context.auth.user?.userRole !== 'VENDOR') {
+      throw redirect({ to: '/' }) // Strict block for Customers/Couriers
     }
   },
   component: VendorLayout,

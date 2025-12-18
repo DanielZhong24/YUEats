@@ -45,9 +45,9 @@ public class SecurityConfig {
                         "/h2-console/**",
                         "/login",
                         "/logout",
-                        "/customers",
-                        "/vendors",
-                        "/couriers",
+                        "/customers/**",
+                        "/vendors/**",
+                        "/couriers/**",
                         "/orders/**",
                         "/restaurants/**",
                         "/users/**"))
@@ -63,7 +63,7 @@ public class SecurityConfig {
                         // Specific Role protections - must come after public paths
                         .requestMatchers("/orders/**").authenticated()
                         .requestMatchers("/vendors/**").hasRole("VENDOR")
-
+                        .requestMatchers("/couriers/**").hasRole("COURIER")
                         // Catch-all for everything else
                         .anyRequest().authenticated())
 
@@ -109,7 +109,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 

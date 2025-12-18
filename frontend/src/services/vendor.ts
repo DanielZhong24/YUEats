@@ -23,41 +23,37 @@ export type CreateMenuItemData = {
   category: string
   isAvailable: boolean
 }
+
 // --- Axios Configuration ---
 
-// This instance automatically uses the Env Variable or defaults to localhost:8080
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
-  withCredentials: true, // Sends cookies/session headers with every request
+  baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// --- API Methods ---
+// --- API Methods: Restaurant & Menu Management ---
 
-/**
- * Get all restaurants for the current vendor (GET /restaurants)
- */
-export async function getVendorRestaurants() {
-  const res = await api.get('/restaurants')
-  return res.data as any[]
+export async function getMyRestaurants() {
+  const res = await api.get('/vendors/me/restaurants')
+  return res.data as Restaurant[]
 }
 
-/**
- * Create a new restaurant (POST /restaurants)
- */
 export async function createRestaurant(req: RestaurantCreationRequest) {
   const res = await api.post('/restaurants', req)
   return res.data
 }
 
-/**
- * Create a menu item for a specific restaurant (POST /restaurants/:id/menu-item)
- */
-// src/services/vendor.ts
+export async function deleteRestaurant(restaurantId: string | number) {
+  await api.delete(`/restaurants/${restaurantId}`)
+}
 
-// ... imports
+export async function getRestaurantMenu(restaurantId: string | number) {
+  const res = await api.get(`/restaurants/${restaurantId}/menu-items`)
+  return res.data
+}
 
 export async function createMenuItem({
   restaurantId,
@@ -66,30 +62,61 @@ export async function createMenuItem({
   restaurantId: number | string
   payload: CreateMenuItemData
 }) {
-  // 1. Backend is a JAVA RECORD, so keys must match exactly 1:1
-  const backendPayload = {
-    itemName: payload.itemName,
-    description: payload.description,
-    price: payload.price,
-    imgUrl: payload.imgUrl,
-    category: payload.category,
-
-    // ✅ CORRECT: Keep it as 'isAvailable' to match the Java Record component
-    isAvailable: payload.isAvailable,
-  }
-
-  // ✅ CORRECT: Ensure URL is PLURAL "menu-items"
-  const res = await api.post(
-    `/restaurants/${restaurantId}/menu-items`,
-    backendPayload,
-  )
-
+  const res = await api.post(`/restaurants/${restaurantId}/menu-items`, payload)
   return res.data
 }
-// --- Mocks / Helpers ---
+
+export async function updateMenuItem(
+  restaurantId: number | string,
+  itemId: number,
+  data: Partial<CreateMenuItemData>,
+) {
+  const res = await api.put(`/restaurants/${restaurantId}/menu-items/${itemId}`, data)
+  return res.data
+}
+
+export async function deleteMenuItem(restaurantId: number | string, itemId: number) {
+  await api.delete(`/restaurants/${restaurantId}/menu-items/${itemId}`)
+}
+
+// --- API Methods: Order Management & Handshake ---
 
 /**
- * MOCK: Analytics data (Backend endpoint might not exist yet)
+ * Get all orders for the vendor's kitchen feed.
+ */
+export async function getRestaurantOrders(restaurantId: string | number) {
+  const res = await api.get(`/orders/restaurant/${restaurantId}`)
+  return res.data
+}
+
+/**
+ * HANDSHAKE: Kitchen staff enters the code shown by the driver.
+ * Matches backend: @PostMapping("/orders/{orderId}/vendor-verify")
+ */
+export async function verifyDriverCode(orderId: number, code: string) {
+  const res = await api.post(`/orders/${orderId}/vendor-verify`, { code })
+  return res.data
+}
+
+/**
+ * This is the function your hook was looking for.
+ * It manually triggers a pickup status change (for testing).
+ */
+export async function simulatePickup(orderId: number) {
+  const res = await api.patch(`/orders/${orderId}/pickup`)
+  return res.data
+}
+
+/**
+ * Manual trigger for simulation (Internal Testing)
+ */
+export async function startOrderPreparation(orderId: number) {
+  const res = await api.patch(`/orders/${orderId}/start-prep`)
+  return res.data
+}
+
+/**
+ * Analytics (Mock)
  */
 export async function getAnalytics(restaurantId?: string) {
   return new Promise((resolve) =>
@@ -104,68 +131,4 @@ export async function getAnalytics(restaurantId?: string) {
       200,
     ),
   )
-}
-
-export async function getMyRestaurants() {
-  const res = await api.get('/vendors/me/restaurants')
-  return res.data as Restaurant[]
-}
-export async function getRestaurantMenu(restaurantId: string | number) {
-  const res = await api.get(`/restaurants/${restaurantId}/menu-items`)
-  return res.data
-}
-
-export async function deleteMenuItem(
-  restaurantId: number | string,
-  itemId: number,
-) {
-  await api.delete(`/restaurants/${restaurantId}/menu-items/${itemId}`)
-}
-
-export async function updateMenuItem(
-  restaurantId: number | string,
-  itemId: number,
-  data: Partial<CreateMenuItemData>,
-) {
-  const res = await api.put(
-    `/restaurants/${restaurantId}/menu-items/${itemId}`,
-    data,
-  )
-  return res.data
-}
-
-export async function deleteRestaurant(restaurantId: string | number) {
-  // This matches your @DeleteMapping("/{id}")
-  await api.delete(`/restaurants/${restaurantId}`)
-}
-
-// Add these to your existing vendor.ts
-
-/**
- * Get all orders for a specific restaurant (Vendor View)
- */
-export async function getRestaurantOrders(restaurantId: string | number) {
-  const res = await api.get(`/orders/restaurant/${restaurantId}`)
-  return res.data
-}
-
-/**
- * Get details for a specific order (Customer View)
- */
-export async function getOrderDetails(orderId: number) {
-  const res = await api.get(`/orders/${orderId}`)
-  return res.data
-}
-
-/**
- * Simulate Courier Pickup (Moves status to IN_TRANSIT)
- */
-export async function simulatePickup(orderId: number) {
-  const res = await api.patch(`/orders/${orderId}/pickup`)
-  return res.data
-}
-
-export async function startOrderPreparation(orderId: number) {
-  const res = await api.patch(`/orders/${orderId}/start-prep`)
-  return res.data
 }

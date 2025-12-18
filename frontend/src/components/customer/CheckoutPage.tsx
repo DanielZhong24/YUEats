@@ -1,4 +1,4 @@
-import { useAuth } from '@/auth/provider' // 👈 Use your AuthContext
+import { useAuth } from '@/auth/provider' 
 import { useCartStore } from '@/store/useCartStore'
 import { Trash2, Clock, MapPin, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
@@ -12,7 +12,6 @@ const CAMPUSES = [
 ]
 
 export default function CheckoutPage() {
-  // 1. Properly pull the user from your context
   const { user, isAuthenticated } = useAuth() 
   const { items, getTotal, clearCart, removeItem } = useCartStore()
   const navigate = useNavigate()
@@ -20,7 +19,6 @@ export default function CheckoutPage() {
   const [selectedCampus, setSelectedCampus] = useState(CAMPUSES[0])
   const [isSubmitting, setIsSubmitting] = useState(false)
 const handlePlaceOrder = async () => {
-  // 1. Group items by their restaurantId
   const groups = items.reduce((acc, item) => {
     if (!acc[item.restaurantId]) acc[item.restaurantId] = [];
     acc[item.restaurantId].push(item);
@@ -30,7 +28,6 @@ const handlePlaceOrder = async () => {
   setIsSubmitting(true);
 
   try {
-    // 2. Create an array of promises (one for each restaurant)
     const orderPromises = Object.entries(groups).map(([rId, groupItems]) => {
       const payload = {
         customerId: Number(user?.id),
@@ -41,15 +38,14 @@ const handlePlaceOrder = async () => {
           quantity: Number(i.quantity)
         }))
       };
-      return customerService.createOrder(payload); // API Call
+      return customerService.createOrder(payload); 
     });
 
-    // 3. Fire all orders at once
     await Promise.all(orderPromises);
 
     alert(`Successfully placed ${Object.keys(groups).length} separate orders!`);
     clearCart();
-    navigate({ to: '/customer/dashboard' });
+    navigate({ to: '/customer' });
   } catch (error) {
     console.error("One or more orders failed", error);
   } finally {

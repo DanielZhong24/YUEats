@@ -1,19 +1,20 @@
-import { useParams, Link } from '@tanstack/react-router' // Added Link for navigation
+import { useParams, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import * as customerService from '@/services/customer'
 import { Plus, Info, Clock, Star, ShoppingBag } from 'lucide-react'
-import { useCartStore } from '@/store/useCartStore' // Import the store
+import { useCartStore } from '@/store/useCartStore'
 
 export default function RestaurantDetail() {
-  const { restaurantId } = useParams({ from: '/customer/restaurant/$restaurantId' })
+  // FIX: The 'from' path must match the route definition exactly
+  const { restaurantId } = useParams({ 
+    from: '/_authenticated/customer/restaurant/$restaurantId' 
+  })
   
-  // Zustand Store Actions & State
   const addItem = useCartStore((state) => state.addItem)
   const cartItems = useCartStore((state) => state.items)
   const cartTotal = useCartStore((state) => state.getTotal())
   const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0)
 
-  // 1. Fetch Restaurant Details
   const { data: restaurants } = useQuery({
     queryKey: ['restaurants'],
     queryFn: customerService.getRestaurants,
@@ -22,15 +23,13 @@ export default function RestaurantDetail() {
 
   const restaurant = restaurants?.find((r: any) => r.id.toString() === restaurantId)
 
-  // 2. Fetch Menu Items
   const { data: menuItems, isLoading } = useQuery({
     queryKey: ['menu', restaurantId],
     queryFn: () => customerService.getRestaurantMenu(restaurantId)
   })
 
   return (
-    <div className="min-h-screen bg-white pb-32"> {/* Increased bottom padding */}
-      {/* Dynamic Banner */}
+    <div className="min-h-screen bg-white pb-32">
       <div className="h-[280px] w-full relative bg-slate-100">
         <img 
           src={restaurant?.bannerImgUrl || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2000'} 
@@ -45,18 +44,13 @@ export default function RestaurantDetail() {
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-4xl font-black text-slate-900 mb-2">
-                {restaurant?.restaurantName || 'Loading Restaurant...'}
+                {restaurant?.restaurantName || 'Loading...'}
               </h1>
               <div className="flex items-center gap-3 text-sm font-bold text-slate-600">
                 <span className="flex items-center gap-1 text-black">
                   <Star size={16} className="fill-black" /> 4.8 (200+ ratings)
                 </span>
-                <span>•</span>
-                <span>Burgers • American</span>
               </div>
-            </div>
-            <div className="bg-slate-100 p-3 rounded-full">
-              <Info size={20} className="text-slate-700" />
             </div>
           </div>
 
@@ -79,22 +73,19 @@ export default function RestaurantDetail() {
               [1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-slate-50 rounded-xl animate-pulse" />)
             ) : (
               menuItems?.map((item: any) => (
-                <div key={item.id} className="flex justify-between items-center pb-6 border-b border-slate-100 group cursor-pointer">
+                <div key={item.id} className="flex justify-between items-center pb-6 border-b border-slate-100 group">
                   <div className="flex-1 pr-4">
-                    <h4 className="font-bold text-[17px] mb-1 group-hover:underline">{item.itemName}</h4>
-                    <p className="text-sm text-slate-500 line-clamp-2 mb-2 leading-relaxed">
+                    <h4 className="font-bold text-[17px] mb-1">{item.itemName}</h4>
+                    <p className="text-sm text-slate-500 line-clamp-2 mb-2">
                       {item.description || 'No description available.'}
                     </p>
                     <p className="font-bold text-slate-900">${item.price.toFixed(2)}</p>
                   </div>
                   <div className="relative w-32 h-32 bg-slate-100 rounded-lg overflow-hidden shrink-0">
-                    <img 
-                      src={item.imgUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
-                    />
+                    <img src={item.imgUrl} className="w-full h-full object-cover" />
                     <button 
-                      onClick={() => addItem(item,Number(restaurantId))} // Add item to Zustand store
-                      className="absolute bottom-2 right-2 bg-white p-1.5 rounded-full shadow-lg hover:bg-black hover:text-white transition-all border border-slate-100 active:scale-90"
+                      onClick={() => addItem(item, Number(restaurantId))}
+                      className="absolute bottom-2 right-2 bg-white p-1.5 rounded-full shadow-lg hover:bg-black hover:text-white transition-all active:scale-90"
                     >
                       <Plus size={20} />
                     </button>
@@ -106,16 +97,13 @@ export default function RestaurantDetail() {
         </div>
       </div>
 
-      {/* View Cart Bar: Only shows when cart has items */}
       {cartItems.length > 0 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-[500px] px-4 z-50 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-[500px] px-4 z-50">
           <Link 
             to="/customer/checkout" 
             className="w-full bg-black text-white flex items-center justify-between px-8 py-4 rounded-xl shadow-2xl hover:bg-slate-800 transition-all"
           >
-            <div className="bg-white/20 px-2.5 py-1 rounded text-sm font-bold">
-              {totalQuantity}
-            </div>
+            <div className="bg-white/20 px-2.5 py-1 rounded text-sm font-bold">{totalQuantity}</div>
             <span className="font-bold text-lg">View Cart</span>
             <span className="font-bold">${cartTotal.toFixed(2)}</span>
           </Link>

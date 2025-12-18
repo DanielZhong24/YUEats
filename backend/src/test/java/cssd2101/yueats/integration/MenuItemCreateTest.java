@@ -62,7 +62,7 @@ public class MenuItemCreateTest {
         User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new RuntimeException("User not found"));
         vendor = (Vendor) user;
 
-        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street");
+        RestaurantCreationRequest restaurantDto = new RestaurantCreationRequest("five guys", vendor.getId(), "123 fake street","http://image.url");
 
         mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restaurantDto))).andExpect(status().isCreated());
@@ -72,7 +72,7 @@ public class MenuItemCreateTest {
 
     @Test
     void createMenuItem() throws Exception {
-        MenuItemCreationRequest dto = new MenuItemCreationRequest("Burger",  "Simple burger", 4.99);
+        MenuItemCreationRequest dto = new MenuItemCreationRequest("Burger",  "Simple burger", 4.99,"http://image.url","Main",true);
 
         mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -85,7 +85,7 @@ public class MenuItemCreateTest {
 
     @Test
     void createMenuItemFail() throws Exception {
-        MenuItemCreationRequest dto = new MenuItemCreationRequest("       ",  "   ", null);
+        MenuItemCreationRequest dto = new MenuItemCreationRequest("       ",  "   ", null,"","",true);
 
         mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -96,7 +96,7 @@ public class MenuItemCreateTest {
 
 
 
-        MenuItemCreationRequest dto2 = new MenuItemCreationRequest("te",  "Simple burger", 4.99);
+        MenuItemCreationRequest dto2 = new MenuItemCreationRequest("te",  "Simple burger", 4.99,"http://image.url","Main",true);
 
         mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
         .contentType(MediaType.APPLICATION_JSON)
@@ -104,7 +104,7 @@ public class MenuItemCreateTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.itemName").value("Name must be between 3 and 30 characters"));
 
-        MenuItemCreationRequest dto3 = new MenuItemCreationRequest("",  "", 4.99);
+        MenuItemCreationRequest dto3 = new MenuItemCreationRequest("",  "", 4.99,"http://image.url","Main",true);
 
         mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +118,7 @@ public class MenuItemCreateTest {
 
     @Test
     void duplicateItem() throws Exception {
-        MenuItemCreationRequest dto = new MenuItemCreationRequest("Burger",  "Simple burger", 4.99);
+        MenuItemCreationRequest dto = new MenuItemCreationRequest("Burger",  "Simple burger", 4.99,"http://image.url","Main",true);
 
         mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)

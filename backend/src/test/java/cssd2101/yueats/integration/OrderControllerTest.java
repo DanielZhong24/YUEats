@@ -64,7 +64,7 @@ public class OrderControllerTest {
         Vendor vendor = (Vendor) vendorUser;
 
         // 2. Create Restaurant
-        RestaurantCreationRequest restDto = new RestaurantCreationRequest("Burger King", vendor.getId(), "123 King St");
+        RestaurantCreationRequest restDto = new RestaurantCreationRequest("Burger King", vendor.getId(), "123 King St","http://image.url");
         mockMvc.perform(post("/restaurants")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(restDto)))
@@ -74,13 +74,13 @@ public class OrderControllerTest {
 
         // 3. Create Menu Items (Burger $10, Fries $5)
         // Assuming your endpoint is /restaurants/{id}/menu-item based on previous context
-        MenuItemCreationRequest item1 = new MenuItemCreationRequest("Burger", "Cheeseburger", 10.00);
+        MenuItemCreationRequest item1 = new MenuItemCreationRequest("Burger", "Cheeseburger", 10.00,"http://image.url","Main",true);
         mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(item1)))
                 .andExpect(status().isCreated());
 
-        MenuItemCreationRequest item2 = new MenuItemCreationRequest("Fries", "Salty fries", 5.00);
+        MenuItemCreationRequest item2 = new MenuItemCreationRequest("Fries", "Salty fries", 5.00,"http://image.url","Main",true);
         mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(item2)))
@@ -174,13 +174,13 @@ public class OrderControllerTest {
         mockMvc.perform(post("/vendors").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(vendor2Dto)));
         Vendor vendor2 = (Vendor) userRepository.findByEmail("vendor2@order.com").orElseThrow();
 
-        RestaurantCreationRequest rest2Dto = new RestaurantCreationRequest("Taco Bell", vendor2.getId(), "456 Taco St");
+        RestaurantCreationRequest rest2Dto = new RestaurantCreationRequest("Taco Bell", vendor2.getId(), "456 Taco St","http://image.url");
         mockMvc.perform(post("/restaurants").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(rest2Dto)));
 
         Restaurant tacoBell = restaurantRepository.findByRestaurantName("Taco Bell").orElseThrow();
 
         // 2. Add Item to Taco Bell
-        MenuItemCreationRequest tacoDto = new MenuItemCreationRequest("Taco", "Crunchy", 2.00);
+        MenuItemCreationRequest tacoDto = new MenuItemCreationRequest("Taco", "Crunchy", 2.00,"http://image.url","Main",true);
         mockMvc.perform(post("/restaurants/{id}/menu-item", tacoBell.getId())
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(tacoDto)));
 

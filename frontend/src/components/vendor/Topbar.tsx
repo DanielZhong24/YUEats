@@ -21,7 +21,7 @@ export default function Topbar() {
           {/* Quick action buttons — prominent */}
           <Button
             onClick={() => setIsModalOpen(true)} // 👈 Open modal on click
-            className="px-4 py-2 rounded-lg bg-emerald-600 text-white shadow hover:bg-emerald-700 flex items-center gap-2"
+            className="px-4 py-2 rounded-lg bg-red-600 text-white shadow hover:bg-red-900 flex items-center gap-2"
           >
             <Plus size={18} />
             Create Restaurant

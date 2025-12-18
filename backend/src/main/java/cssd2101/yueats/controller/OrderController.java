@@ -1,13 +1,15 @@
 package cssd2101.yueats.controller;
 
 import cssd2101.yueats.dto.OrderCreationRequest;
+import cssd2101.yueats.dto.PickupCodeRequest;
 import cssd2101.yueats.model.Order;
 import cssd2101.yueats.service.OrderService;
 import cssd2101.yueats.repository.OrderRepository;
-import cssd2101.yueats.types.OrderStatus;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,64 +19,66 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
-    private final OrderRepository orderRepository; // Added for easy simulation access
+    private final OrderRepository orderRepository;
 
     public OrderController(OrderService orderService, OrderRepository orderRepository) {
         this.orderService = orderService;
         this.orderRepository = orderRepository;
     }
 
-    /**
-     * EXISTING: Create an order as a customer
-     */
+    // 1. Create Order
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody @Valid OrderCreationRequest request) {
         Order newOrder = orderService.createOrder(request);
         return new ResponseEntity<>(newOrder, HttpStatus.CREATED);
     }
 
-    /**
-     * VENDOR DASHBOARD: Get all orders for a specific restaurant
-     * Use this in React to show the "Live Feed"
-     */
+    // 2. Customer Dashboard: GET /orders/customer/9
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<List<Order>> getCustomerOrders(@PathVariable("customerId") Integer customerId) {
+        List<Order> orders = orderRepository.findByCustomerId(customerId);
+        return ResponseEntity.ok(orders);
+    }
+
+    // 3. Vendor Dashboard: GET /orders/restaurant/{id}
     @GetMapping("/restaurant/{restaurantId}")
-    public ResponseEntity<List<Order>> getRestaurantOrders(@PathVariable Integer restaurantId) {
+    public ResponseEntity<List<Order>> getRestaurantOrders(@PathVariable("restaurantId") Integer restaurantId) {
         List<Order> orders = orderRepository.findByRestaurantId(restaurantId);
         return ResponseEntity.ok(orders);
     }
 
-    /**
-     * CUSTOMER DASHBOARD: Get current status of a single order
-     */
+    // 4. Courier Dashboard: GET /orders/courier
+    @GetMapping("/courier")
+    public ResponseEntity<List<Order>> getCourierOrders(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        List<Order> orders = orderRepository.findByCourierEmail(userDetails.getUsername());
+        return ResponseEntity.ok(orders);
+    }
+
+    // 5. Handshake: POST /orders/{orderId}/vendor-verify
+    @PostMapping("/{orderId}/vendor-verify")
+    public ResponseEntity<Void> vendorVerifyPickup(
+            @PathVariable("orderId") Integer orderId,
+            @RequestBody @Valid PickupCodeRequest req,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        orderService.vendorVerifyPickup(orderId, req.code(), userDetails.getUsername());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    // 6. Tracking: GET /orders/{orderId}
     @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+    public ResponseEntity<Order> getOrderById(@PathVariable("orderId") Long orderId) {
         return orderRepository.findById(orderId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * COURIER SIMULATION: Manually trigger pickup
-     * This moves the order to IN_TRANSIT, letting the Scheduler
-     * finish the delivery in 60 seconds.
-     */
-    @PatchMapping("/{orderId}/pickup")
-    public ResponseEntity<Order> pickupOrder(@PathVariable Long orderId) {
-        return orderRepository.findById(orderId).map(order -> {
-            order.setStatus(OrderStatus.IN_TRANSIT);
-            orderRepository.save(order);
-            return ResponseEntity.ok(order);
-        }).orElse(ResponseEntity.notFound().build());
-    }
-
-    /**
-     * CUSTOMER DASHBOARD: Get all orders for a specific customer
-     * Use this to show the "Active Orders" tracking list in React
-     */
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<Order>> getCustomerOrders(@PathVariable Integer customerId) {
-        // Note: Ensure you have findByCustomerId in your OrderRepository
-        List<Order> orders = orderRepository.findByCustomerId(customerId);
-        return ResponseEntity.ok(orders);
+    @PatchMapping("/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrder(
+            @PathVariable("orderId") Long orderId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        orderService.cancelOrder(orderId, userDetails.getUsername());
+        return ResponseEntity.ok().build();
     }
 }

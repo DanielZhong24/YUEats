@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Home, ClipboardList, ShoppingBag, LogOut,Activity } from 'lucide-react'
+import { Home,Activity } from 'lucide-react'
 
 export default function CustomerLayout({ children }: { children: React.ReactNode }) {
   return (

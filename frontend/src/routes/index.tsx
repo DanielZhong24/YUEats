@@ -1,12 +1,23 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import Hero from '@/components/ui/hero'
-
+import {Hero} from '@/components/ui/hero'
+import {useAuth} from '@/auth/provider'
 export const Route = createFileRoute('/')({
   component: App,
 })
 
 function App() {
+  const {user} = useAuth()
+  const getDashboardLink = () => {
+      if (!user) return '/login'
+      
+      switch (user.userRole) {
+        case 'CUSTOMER': return '/customer'
+        case 'VENDOR':   return '/vendor'
+        case 'COURIER':  return '/courier'
+        default:         return '/login'
+      }
+  }
   return (
     <div className="bg-background text-foreground">
       {/* HERO SECTION */}
@@ -33,16 +44,35 @@ function App() {
               <span className="font-semibold text-lg text-white">YuEats</span>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Link to="/login">
-                <Button variant="secondary" className="rounded-full">
-                  Login
-                </Button>
-              </Link>
+<div className="flex items-center space-x-2">
+              {user ? (
+                /* AUTHENTICATED STATE */
+                <div className="flex items-center gap-4">
+                  <span className="text-white text-sm font-bold hidden md:block">
+                    Welcome back, {user.firstName}
+                  </span>
+                  <Link to={getDashboardLink()}>
+                    <Button className="rounded-full bg-red-600 hover:bg-red-700 text-white border-none px-6">
+                      Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                /* GUEST STATE */
+                <>
+                  <Link to="/auth" search={{mode:'login'}}>
+                    <Button variant="secondary" className="rounded-full px-6">
+                      Login
+                    </Button>
+                  </Link>
 
-              <Link to="/signup">
-                <Button className="rounded-full">Sign up</Button>
-              </Link>
+                  <Link to="/auth" search={{mode:'signup'}}>
+                    <Button className="rounded-full bg-red-600 hover:bg-red-700 text-white border-none px-6">
+                      Sign up
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </header>
@@ -72,7 +102,7 @@ function App() {
               </h3>
 
               <Link
-                to="/business/signup"
+                to="/vendor"
                 className="text-sm text-primary underline"
               >
                 Create business account
@@ -91,7 +121,7 @@ function App() {
 
               <h3 className="text-3xl font-bold mb-2">Add your restaurant</h3>
 
-              <Link to="/vendor/add" className="text-sm text-primary underline">
+              <Link to="/vendor" className="text-sm text-primary underline">
                 Add restaurant
               </Link>
             </div>

@@ -15,6 +15,7 @@ interface AuthCardProps {
   onLogin: (data: LoginPayload) => void
   isPending?: boolean
   onSuccess?: () => void
+  defaultMode?: 'login' | 'signup'; 
 }
 
 export function AuthCard({
@@ -22,21 +23,24 @@ export function AuthCard({
   onLogin,
   isPending = false,
   onSuccess,
+  defaultMode = 'login' 
 }: AuthCardProps) {
   return (
     <Card className="w-full sm:max-w-lg">
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Signup / Login</CardTitle>
+        <CardTitle className="text-xl italic font-black text-red-600">YUEats</CardTitle>
         <CardDescription>
-          Create an account to get started with YUEats!
+          {defaultMode === 'signup' ? 'Create an account to get started!' : 'Welcome back!'}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="signup">
-          <TabsList className="self-center">
+        {/* Change defaultValue from "signup" to defaultMode */}
+        <Tabs defaultValue={defaultMode} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="signup">Signup</TabsTrigger>
             <TabsTrigger value="login">Login</TabsTrigger>
           </TabsList>
+          
           <TabsContent value="signup">
             <SignupForm
               onSubmit={onSignup}
@@ -44,6 +48,7 @@ export function AuthCard({
               onSuccess={onSuccess}
             />
           </TabsContent>
+          
           <TabsContent value="login">
             <LoginForm
               onSubmit={onLogin}
