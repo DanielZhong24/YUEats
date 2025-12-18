@@ -3,29 +3,67 @@ package cssd2101.yueats.controller;
 import cssd2101.yueats.dto.OrderCreationRequest;
 import cssd2101.yueats.model.Order;
 import cssd2101.yueats.service.OrderService;
+import cssd2101.yueats.repository.OrderRepository;
+import cssd2101.yueats.types.OrderStatus;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderRepository orderRepository; // Added for easy simulation access
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, OrderRepository orderRepository) {
         this.orderService = orderService;
+        this.orderRepository = orderRepository;
     }
 
     /**
-     * Create an order as a customer
-     * @param request The request information from the client
-     * @return A response entity with the new order that was created
+     * EXISTING: Create an order as a customer
      */
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody @Valid OrderCreationRequest request) {
         Order newOrder = orderService.createOrder(request);
         return new ResponseEntity<>(newOrder, HttpStatus.CREATED);
+    }
+
+    /**
+     * VENDOR DASHBOARD: Get all orders for a specific restaurant
+     * Use this in React to show the "Live Feed"
+     */
+    @GetMapping("/restaurant/{restaurantId}")
+    public ResponseEntity<List<Order>> getRestaurantOrders(@PathVariable Integer restaurantId) {
+        List<Order> orders = orderRepository.findByRestaurantId(restaurantId);
+        return ResponseEntity.ok(orders);
+    }
+
+    /**
+     * CUSTOMER DASHBOARD: Get current status of a single order
+     */
+    @GetMapping("/{orderId}")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+        return orderRepository.findById(orderId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * DRIVER SIMULATION: Manually trigger pickup
+     * This moves the order to IN_TRANSIT, letting the Scheduler
+     * finish the delivery in 60 seconds.
+     */
+    @PatchMapping("/{orderId}/pickup")
+    public ResponseEntity<Order> pickupOrder(@PathVariable Long orderId) {
+        return orderRepository.findById(orderId).map(order -> {
+            order.setStatus(OrderStatus.IN_TRANSIT);
+            orderRepository.save(order);
+            return ResponseEntity.ok(order);
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

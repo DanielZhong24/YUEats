@@ -37,7 +37,7 @@ public class Restaurant {
 
 
     @Column(name="banner_img_url")
-    private String banner_img_url;
+    private String bannerImgUrl;
     public List<MenuItem> getMenuItems() {
         if (menuItems == null) {
             menuItems = new ArrayList<>();
