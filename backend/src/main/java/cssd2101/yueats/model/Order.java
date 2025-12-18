@@ -12,22 +12,23 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 @Entity
-@Table(name="orders")
+@Table(name = "orders")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order{
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name="user_id",nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User customer;
 
     @ManyToOne
-    @JoinColumn(name="restaurant_id",nullable = false)
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     private LocalDateTime orderDate;
@@ -42,14 +43,13 @@ public class Order{
     private String deliveryAddress;
 
     @ManyToOne
-    @JoinColumn(name = "driver_id")
-    private DeliveryDriver driver;
+    @JoinColumn(name = "courier_id")
+    private DeliveryCourier courier;
 
     @Column(length = 10)
     private String pickupCode;
 
-
-    @OneToMany(mappedBy = "order",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     @ToString.Exclude
     private List<OrderDetail> orderDetails = new ArrayList<>();

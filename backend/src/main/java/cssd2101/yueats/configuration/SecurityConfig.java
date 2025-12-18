@@ -47,14 +47,14 @@ public class SecurityConfig {
                         "/logout",
                         "/customers",
                         "/vendors",
-                        "/drivers",
+                        "/couriers",
                         "/orders/**",
                         "/restaurants/**",
                         "/users/**"))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(auth -> auth
                         // Publicly accessible paths - signup endpoints must come first
-                        .requestMatchers("/customers", "/vendors", "/drivers", "/h2-console/**", "/login")
+                        .requestMatchers("/customers", "/vendors", "/couriers", "/h2-console/**", "/login")
                         .permitAll()
 
                         // Public restaurant browsing

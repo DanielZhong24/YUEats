@@ -54,7 +54,7 @@ public class OrderController {
     }
 
     /**
-     * DRIVER SIMULATION: Manually trigger pickup
+     * COURIER SIMULATION: Manually trigger pickup
      * This moves the order to IN_TRANSIT, letting the Scheduler
      * finish the delivery in 60 seconds.
      */

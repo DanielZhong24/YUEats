@@ -3,7 +3,7 @@ package cssd2101.yueats.factory;
 import cssd2101.yueats.dto.CustomerSignupRequest;
 import cssd2101.yueats.dto.VendorSignupRequest;
 import cssd2101.yueats.model.Customer;
-import cssd2101.yueats.model.DeliveryDriver;
+import cssd2101.yueats.model.DeliveryCourier;
 import cssd2101.yueats.model.Vendor;
 import cssd2101.yueats.types.UserRole;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 public class UserFactory {
     /**
      * Create a user with the customer role
-     * @param dto The information sent from the client with the required information
+     * 
+     * @param dto            The information sent from the client with the required
+     *                       information
      * @param hashedPassword The hashed password
      * @return The created customer with the hashed password
      */
@@ -30,7 +32,9 @@ public class UserFactory {
 
     /**
      * Create a user with the vendor role
-     * @param dto The information sent from the client with the required information
+     * 
+     * @param dto            The information sent from the client with the required
+     *                       information
      * @param hashedPassword The hashed password
      * @return The created vendor with the hashed password
      */
@@ -48,13 +52,15 @@ public class UserFactory {
     }
 
     /**
-     * Create a user with the delivery driver role
-     * @param dto The information sent from the client with the required information
+     * Create a user with the delivery courier role
+     * 
+     * @param dto            The information sent from the client with the required
+     *                       information
      * @param hashedPassword The hashed password
-     * @return The created delivery driver with the hashed passwor
+     * @return The created delivery courier with the hashed passwor
      */
-    public DeliveryDriver createDriver(CustomerSignupRequest dto, String hashedPassword) {
-        return DeliveryDriver.builder()
+    public DeliveryCourier createCourier(CustomerSignupRequest dto, String hashedPassword) {
+        return DeliveryCourier.builder()
                 .email(dto.email())
                 .passwordHash(hashedPassword)
                 .firstName(dto.firstName())
@@ -63,7 +69,5 @@ public class UserFactory {
                 .userRole(UserRole.COURIER)
                 .isVerified(false).build();
     }
-
-
 
 }

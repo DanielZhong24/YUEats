@@ -1,6 +1,5 @@
 package cssd2101.yueats.integration;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cssd2101.yueats.dto.*;
 import cssd2101.yueats.model.*;
@@ -37,445 +36,438 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestConfig.class)
 public class DeliveryPickupTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private OrderService orderService;
+        @Autowired
+        private OrderRepository orderRepository;
+        @Autowired
+        private OrderService orderService;
 
-    @Autowired
-    private MenuItemRepository menuItemRepository;
+        @Autowired
+        private MenuItemRepository menuItemRepository;
 
-    @Autowired
-    private RestaurantRepository restaurantRepository;
+        @Autowired
+        private RestaurantRepository restaurantRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @Autowired
-    private OrderStateMachine orderStateMachine;
+        @Autowired
+        private OrderStateMachine orderStateMachine;
 
-    private DeliveryDriver driver;
-    private Order order;
+        private DeliveryCourier courier;
+        private Order order;
 
-    private User customer;
-    private Restaurant restaurant;
+        private User customer;
+        private Restaurant restaurant;
 
-    private MenuItem pizza;
-    private MenuItem rings;
+        private MenuItem pizza;
+        private MenuItem rings;
 
-    @BeforeEach
-    void setup() throws Exception {
-        CustomerSignupRequest driverDto = new CustomerSignupRequest("driver@testing.com", "Driver", "Tester", "1234567890",
-                "Password123!");
+        @BeforeEach
+        void setup() throws Exception {
+                CustomerSignupRequest courierDto = new CustomerSignupRequest("courier@testing.com", "Courier", "Tester",
+                                "1234567890",
+                                "Password123!");
 
-        mockMvc.perform(post("/drivers").contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(driverDto)))
-                .andExpect(status().isCreated());
+                mockMvc.perform(post("/couriers").contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(courierDto)))
+                                .andExpect(status().isCreated());
 
-        User user = userRepository.findByEmail("driver@testing.com").orElseThrow();
-        driver = (DeliveryDriver) user;
+                User user = userRepository.findByEmail("courier@testing.com").orElseThrow();
+                courier = (DeliveryCourier) user;
 
-        // 1. Create Vendor
-        VendorSignupRequest vendorDto = new VendorSignupRequest("vendor@testvend.com",
-                "vendor", "owner", "1234567890", "Password123!", "BurgerKing");
+                // 1. Create Vendor
+                VendorSignupRequest vendorDto = new VendorSignupRequest("vendor@testvend.com",
+                                "vendor", "owner", "1234567890", "Password123!", "BurgerKing");
 
-        mockMvc.perform(post("/vendors")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vendorDto)))
-                .andExpect(status().isCreated());
+                mockMvc.perform(post("/vendors")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(vendorDto)))
+                                .andExpect(status().isCreated());
 
-        User vendorUser = userRepository.findByEmail("vendor@testvend.com").orElseThrow();
-        Vendor vendor = (Vendor) vendorUser;
+                User vendorUser = userRepository.findByEmail("vendor@testvend.com").orElseThrow();
+                Vendor vendor = (Vendor) vendorUser;
 
-        // 2. Create Restaurant
-        RestaurantCreationRequest restDto = new RestaurantCreationRequest("Pizza Pizza", vendor.getId(), "123 Pizza St");
-        mockMvc.perform(post("/restaurants")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(restDto)))
-                .andExpect(status().isCreated());
+                // 2. Create Restaurant
+                RestaurantCreationRequest restDto = new RestaurantCreationRequest("Pizza Pizza", vendor.getId(),
+                                "123 Pizza St");
+                mockMvc.perform(post("/restaurants")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(restDto)))
+                                .andExpect(status().isCreated());
 
-        restaurant = restaurantRepository.findByRestaurantName("Pizza Pizza").orElseThrow();
+                restaurant = restaurantRepository.findByRestaurantName("Pizza Pizza").orElseThrow();
 
-        MenuItemCreationRequest item1 = new MenuItemCreationRequest("Pizza", "Cheese Pizza", 10.00);
-        mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(item1)))
-                .andExpect(status().isCreated());
+                MenuItemCreationRequest item1 = new MenuItemCreationRequest("Pizza", "Cheese Pizza", 10.00);
+                mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(item1)))
+                                .andExpect(status().isCreated());
 
-        MenuItemCreationRequest item2 = new MenuItemCreationRequest("Onion Rings", "Salty onion rings", 5.00);
-        mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(item2)))
-                .andExpect(status().isCreated());
+                MenuItemCreationRequest item2 = new MenuItemCreationRequest("Onion Rings", "Salty onion rings", 5.00);
+                mockMvc.perform(post("/restaurants/{id}/menu-item", restaurant.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(item2)))
+                                .andExpect(status().isCreated());
 
-        // Fetch items from DB to get their IDs
-        List<MenuItem> items = menuItemRepository.findAll();
-        pizza = items.stream().filter(i -> i.getItemName().equals("Pizza")).findFirst().orElseThrow();
-        rings = items.stream().filter(i -> i.getItemName().equals("Onion Rings")).findFirst().orElseThrow();
+                // Fetch items from DB to get their IDs
+                List<MenuItem> items = menuItemRepository.findAll();
+                pizza = items.stream().filter(i -> i.getItemName().equals("Pizza")).findFirst().orElseThrow();
+                rings = items.stream().filter(i -> i.getItemName().equals("Onion Rings")).findFirst().orElseThrow();
 
-        // 4. Create Customer
-        CustomerSignupRequest customerDto = new CustomerSignupRequest("bobsmith@customer.com", "Bob", "Smith", "3945739284", "Password123!");
-        mockMvc.perform(post("/customers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(customerDto)))
-                .andExpect(status().isCreated());
+                // 4. Create Customer
+                CustomerSignupRequest customerDto = new CustomerSignupRequest("bobsmith@customer.com", "Bob", "Smith",
+                                "3945739284", "Password123!");
+                mockMvc.perform(post("/customers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(customerDto)))
+                                .andExpect(status().isCreated());
 
-        customer = userRepository.findByEmail("bobsmith@customer.com").orElseThrow();
-    }
-
-    @Test
-    void testOrderProgression() throws Exception {
-        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
-        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
-
-        OrderCreationRequest orderDto = new OrderCreationRequest(
-                customer.getId(),
-                restaurant.getId(),
-                "Bob smith Home Address",
-                List.of(orderItem1, orderItem2)
-        );
-
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDto)))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.totalPrice").value(25.00))
-                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
-
-        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
-        Order order1 = orders.get(0);
-
-        Assertions.assertEquals(OrderStatus.PENDING, order1.getStatus());
-
-        orderStateMachine.updateOrderStatus(order1);
-
-        Assertions.assertEquals(OrderStatus.PREPARING, order1.getStatus());
-
-        orderStateMachine.updateOrderStatus(order1);
-        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
-        Assertions.assertNotNull(order1.getPickupCode());
-    }
-
-
-
-    @Test
-    void testReadyOrders() throws Exception {
-        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
-        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
-
-        OrderCreationRequest orderDto = new OrderCreationRequest(
-                customer.getId(),
-                restaurant.getId(),
-                "Bob smith Home Address",
-                List.of(orderItem1, orderItem2)
-        );
-
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDto)))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.totalPrice").value(25.00))
-                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
-
-        OrderItemRequest orderItem3 = new OrderItemRequest(pizza.getId(), 1);
-        OrderItemRequest orderItem4 = new OrderItemRequest(rings.getId(), 2);
-
-        OrderCreationRequest orderDto2 = new OrderCreationRequest(
-                customer.getId(),
-                restaurant.getId(),
-                "Bob smith Home Address",
-                List.of(orderItem3, orderItem4)
-        );
-
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDto2)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("PENDING"));
-
-        OrderItemRequest orderItem5 = new OrderItemRequest(pizza.getId(), 1);
-        OrderItemRequest orderItem6 = new OrderItemRequest(rings.getId(), 2);
-
-        OrderCreationRequest orderDto3 = new OrderCreationRequest(
-                customer.getId(),
-                restaurant.getId(),
-                "Bob smith Home Address",
-                List.of(orderItem5, orderItem6)
-        );
-
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDto3)))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("PENDING"));
-
-
-        List<Order> orders = orderRepository.findByStatus(OrderStatus.PENDING);
-        for (Order order: orders) {
-            orderStateMachine.updateOrderStatus(order);
-            orderStateMachine.updateOrderStatus(order);
+                customer = userRepository.findByEmail("bobsmith@customer.com").orElseThrow();
         }
 
-        mockMvc.perform(get("/drivers/orders/available").with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3));
+        @Test
+        void testOrderProgression() throws Exception {
+                OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+                OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
 
-        mockMvc.perform(get("/drivers/orders/available").with(user(customer.getEmail()).roles("CUSTOMER")))
-                .andExpect(status().isBadRequest());
-    }
+                OrderCreationRequest orderDto = new OrderCreationRequest(
+                                customer.getId(),
+                                restaurant.getId(),
+                                "Bob smith Home Address",
+                                List.of(orderItem1, orderItem2));
 
-    @Test
-    void testClaimOrder() throws Exception {
-        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
-        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+                mockMvc.perform(post("/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(orderDto)))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status").value("PENDING"))
+                                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
 
-        OrderCreationRequest orderDto = new OrderCreationRequest(
-                customer.getId(),
-                restaurant.getId(),
-                "Bob smith Home Address",
-                List.of(orderItem1, orderItem2)
-        );
+                List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+                Order order1 = orders.get(0);
 
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDto)))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.totalPrice").value(25.00))
-                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+                Assertions.assertEquals(OrderStatus.PENDING, order1.getStatus());
 
-        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
-        Order order1 = orders.get(0);
+                orderStateMachine.updateOrderStatus(order1);
 
-        orderStateMachine.updateOrderStatus(order1);
-        orderStateMachine.updateOrderStatus(order1);
+                Assertions.assertEquals(OrderStatus.PREPARING, order1.getStatus());
 
-        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+                orderStateMachine.updateOrderStatus(order1);
+                Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+                Assertions.assertNotNull(order1.getPickupCode());
+        }
 
-        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
-                .with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isAccepted());
+        @Test
+        void testReadyOrders() throws Exception {
+                OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+                OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
 
-        Assertions.assertEquals(OrderStatus.PICKED_UP, order1.getStatus());
-        Assertions.assertEquals(driver, order1.getDriver());
-    }
+                OrderCreationRequest orderDto = new OrderCreationRequest(
+                                customer.getId(),
+                                restaurant.getId(),
+                                "Bob smith Home Address",
+                                List.of(orderItem1, orderItem2));
 
-    @Test
-    void testClaimOrderFail() throws Exception {
-        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
-        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+                mockMvc.perform(post("/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(orderDto)))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status").value("PENDING"))
+                                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
 
-        OrderCreationRequest orderDto = new OrderCreationRequest(
-                customer.getId(),
-                restaurant.getId(),
-                "Bob smith Home Address",
-                List.of(orderItem1, orderItem2)
-        );
+                OrderItemRequest orderItem3 = new OrderItemRequest(pizza.getId(), 1);
+                OrderItemRequest orderItem4 = new OrderItemRequest(rings.getId(), 2);
 
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDto)))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.totalPrice").value(25.00))
-                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+                OrderCreationRequest orderDto2 = new OrderCreationRequest(
+                                customer.getId(),
+                                restaurant.getId(),
+                                "Bob smith Home Address",
+                                List.of(orderItem3, orderItem4));
 
-        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
-        Order order1 = orders.get(0);
+                mockMvc.perform(post("/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(orderDto2)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status").value("PENDING"));
 
-        orderStateMachine.updateOrderStatus(order1);
-        orderStateMachine.updateOrderStatus(order1);
+                OrderItemRequest orderItem5 = new OrderItemRequest(pizza.getId(), 1);
+                OrderItemRequest orderItem6 = new OrderItemRequest(rings.getId(), 2);
 
-        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
-                .with(user(customer.getEmail()).roles("CUSTOMER")))
-                .andExpect(status().isBadRequest());
+                OrderCreationRequest orderDto3 = new OrderCreationRequest(
+                                customer.getId(),
+                                restaurant.getId(),
+                                "Bob smith Home Address",
+                                List.of(orderItem5, orderItem6));
 
-        mockMvc.perform(post("/drivers/orders/{id}/claim", "")
-                .with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isBadRequest());
-    }
+                mockMvc.perform(post("/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(orderDto3)))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status").value("PENDING"));
 
-    @Test
-    void testPickupOrder() throws Exception {
-        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
-        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+                List<Order> orders = orderRepository.findByStatus(OrderStatus.PENDING);
+                for (Order order : orders) {
+                        orderStateMachine.updateOrderStatus(order);
+                        orderStateMachine.updateOrderStatus(order);
+                }
 
-        OrderCreationRequest orderDto = new OrderCreationRequest(
-                customer.getId(),
-                restaurant.getId(),
-                "Bob smith Home Address",
-                List.of(orderItem1, orderItem2)
-        );
+                mockMvc.perform(get("/couriers/orders/available").with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(3));
 
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDto)))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.totalPrice").value(25.00))
-                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+                mockMvc.perform(get("/couriers/orders/available").with(user(customer.getEmail()).roles("CUSTOMER")))
+                                .andExpect(status().isBadRequest());
+        }
 
-        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
-        Order order1 = orders.get(0);
+        @Test
+        void testClaimOrder() throws Exception {
+                OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+                OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
 
-        orderStateMachine.updateOrderStatus(order1);
-        orderStateMachine.updateOrderStatus(order1);
+                OrderCreationRequest orderDto = new OrderCreationRequest(
+                                customer.getId(),
+                                restaurant.getId(),
+                                "Bob smith Home Address",
+                                List.of(orderItem1, orderItem2));
 
-        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+                mockMvc.perform(post("/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(orderDto)))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status").value("PENDING"))
+                                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
 
-        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
-                        .with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isAccepted());
+                List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+                Order order1 = orders.get(0);
 
-        Assertions.assertEquals(OrderStatus.PICKED_UP, order1.getStatus());
-        Assertions.assertEquals(driver, order1.getDriver());
+                orderStateMachine.updateOrderStatus(order1);
+                orderStateMachine.updateOrderStatus(order1);
 
-        Order claimedOrder = orderRepository.findById(Long.valueOf(order1.getId())).orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        String code = claimedOrder.getPickupCode();
+                Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
 
-        PickupCodeRequest codeRequest = new PickupCodeRequest(code);
+                mockMvc.perform(post("/couriers/orders/{id}/claim", order1.getId())
+                                .with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isAccepted());
 
-        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(codeRequest))
-                .with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isAccepted());
+                Assertions.assertEquals(OrderStatus.PICKED_UP, order1.getStatus());
+                Assertions.assertEquals(courier, order1.getCourier());
+        }
 
-        Assertions.assertEquals(OrderStatus.IN_TRANSIT, order1.getStatus());
-        Assertions.assertEquals(driver, order1.getDriver());
-    }
+        @Test
+        void testClaimOrderFail() throws Exception {
+                OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+                OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
 
-    @Test
-    void testPickupOrderFail() throws Exception {
-        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
-        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+                OrderCreationRequest orderDto = new OrderCreationRequest(
+                                customer.getId(),
+                                restaurant.getId(),
+                                "Bob smith Home Address",
+                                List.of(orderItem1, orderItem2));
 
-        OrderCreationRequest orderDto = new OrderCreationRequest(
-                customer.getId(),
-                restaurant.getId(),
-                "Bob smith Home Address",
-                List.of(orderItem1, orderItem2)
-        );
+                mockMvc.perform(post("/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(orderDto)))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status").value("PENDING"))
+                                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
 
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDto)))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.totalPrice").value(25.00))
-                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+                List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+                Order order1 = orders.get(0);
 
-        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
-        Order order1 = orders.get(0);
+                orderStateMachine.updateOrderStatus(order1);
+                orderStateMachine.updateOrderStatus(order1);
 
-        orderStateMachine.updateOrderStatus(order1);
-        orderStateMachine.updateOrderStatus(order1);
+                mockMvc.perform(post("/couriers/orders/{id}/claim", order1.getId())
+                                .with(user(customer.getEmail()).roles("CUSTOMER")))
+                                .andExpect(status().isBadRequest());
 
-        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+                mockMvc.perform(post("/couriers/orders/{id}/claim", "")
+                                .with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isBadRequest());
+        }
 
-        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
-                        .with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isAccepted());
+        @Test
+        void testPickupOrder() throws Exception {
+                OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+                OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
 
-        PickupCodeRequest codeRequest = new PickupCodeRequest("");
+                OrderCreationRequest orderDto = new OrderCreationRequest(
+                                customer.getId(),
+                                restaurant.getId(),
+                                "Bob smith Home Address",
+                                List.of(orderItem1, orderItem2));
 
-        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(codeRequest))
-                        .with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("must not be blank"));
+                mockMvc.perform(post("/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(orderDto)))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status").value("PENDING"))
+                                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
 
-        PickupCodeRequest codeRequest2 = new PickupCodeRequest("Bob smith Home Address");
-        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(codeRequest2))
-                .with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isBadRequest());
+                List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+                Order order1 = orders.get(0);
 
-        Order claimedOrder = orderRepository.findById(Long.valueOf(order1.getId())).orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        String code = claimedOrder.getPickupCode();
+                orderStateMachine.updateOrderStatus(order1);
+                orderStateMachine.updateOrderStatus(order1);
 
-        PickupCodeRequest codeRequest3 = new PickupCodeRequest(code);
-        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(codeRequest3))
-                .with(user("bobsmith@test.com").roles("COURIER")))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("This order is not assigned to you"));
+                Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
 
-    }
+                mockMvc.perform(post("/couriers/orders/{id}/claim", order1.getId())
+                                .with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isAccepted());
 
-    @Test
-    void testDelivery() throws Exception {
-        OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
-        OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+                Assertions.assertEquals(OrderStatus.PICKED_UP, order1.getStatus());
+                Assertions.assertEquals(courier, order1.getCourier());
 
-        OrderCreationRequest orderDto = new OrderCreationRequest(
-                customer.getId(),
-                restaurant.getId(),
-                "Bob smith Home Address",
-                List.of(orderItem1, orderItem2)
-        );
+                Order claimedOrder = orderRepository.findById(Long.valueOf(order1.getId()))
+                                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                String code = claimedOrder.getPickupCode();
 
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDto)))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.totalPrice").value(25.00))
-                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+                PickupCodeRequest codeRequest = new PickupCodeRequest(code);
 
-        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
-        Order order1 = orders.get(0);
+                mockMvc.perform(post("/couriers/orders/{id}/pickup", order1.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(codeRequest))
+                                .with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isAccepted());
 
-        orderStateMachine.updateOrderStatus(order1);
-        orderStateMachine.updateOrderStatus(order1);
+                Assertions.assertEquals(OrderStatus.IN_TRANSIT, order1.getStatus());
+                Assertions.assertEquals(courier, order1.getCourier());
+        }
 
-        Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+        @Test
+        void testPickupOrderFail() throws Exception {
+                OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+                OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
 
-        mockMvc.perform(post("/drivers/orders/{id}/claim", order1.getId())
-                        .with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isAccepted());
+                OrderCreationRequest orderDto = new OrderCreationRequest(
+                                customer.getId(),
+                                restaurant.getId(),
+                                "Bob smith Home Address",
+                                List.of(orderItem1, orderItem2));
 
-        Assertions.assertEquals(OrderStatus.PICKED_UP, order1.getStatus());
-        Assertions.assertEquals(driver, order1.getDriver());
+                mockMvc.perform(post("/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(orderDto)))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status").value("PENDING"))
+                                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
 
-        Order claimedOrder = orderRepository.findById(Long.valueOf(order1.getId())).orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        String code = claimedOrder.getPickupCode();
+                List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+                Order order1 = orders.get(0);
 
-        PickupCodeRequest codeRequest = new PickupCodeRequest(code);
+                orderStateMachine.updateOrderStatus(order1);
+                orderStateMachine.updateOrderStatus(order1);
 
-        mockMvc.perform(post("/drivers/orders/{id}/pickup", order1.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(codeRequest))
-                        .with(user(driver.getEmail()).roles("COURIER")))
-                .andExpect(status().isAccepted());
+                Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
 
-        Assertions.assertEquals(OrderStatus.IN_TRANSIT, order1.getStatus());
-        Assertions.assertEquals(driver, order1.getDriver());
+                mockMvc.perform(post("/couriers/orders/{id}/claim", order1.getId())
+                                .with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isAccepted());
 
-        orderStateMachine.updateTransit(order1);
+                PickupCodeRequest codeRequest = new PickupCodeRequest("");
 
-        Assertions.assertEquals(OrderStatus.DELIVERED, order1.getStatus());
+                mockMvc.perform(post("/couriers/orders/{id}/pickup", order1.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(codeRequest))
+                                .with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.code").value("must not be blank"));
 
-    }
+                PickupCodeRequest codeRequest2 = new PickupCodeRequest("Bob smith Home Address");
+                mockMvc.perform(post("/couriers/orders/{id}/pickup", order1.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(codeRequest2))
+                                .with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isBadRequest());
 
+                Order claimedOrder = orderRepository.findById(Long.valueOf(order1.getId()))
+                                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                String code = claimedOrder.getPickupCode();
+
+                PickupCodeRequest codeRequest3 = new PickupCodeRequest(code);
+                mockMvc.perform(post("/couriers/orders/{id}/pickup", order1.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(codeRequest3))
+                                .with(user("bobsmith@test.com").roles("COURIER")))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(content().string("This order is not assigned to you"));
+
+        }
+
+        @Test
+        void testDelivery() throws Exception {
+                OrderItemRequest orderItem1 = new OrderItemRequest(pizza.getId(), 2);
+                OrderItemRequest orderItem2 = new OrderItemRequest(rings.getId(), 1);
+
+                OrderCreationRequest orderDto = new OrderCreationRequest(
+                                customer.getId(),
+                                restaurant.getId(),
+                                "Bob smith Home Address",
+                                List.of(orderItem1, orderItem2));
+
+                mockMvc.perform(post("/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(orderDto)))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status").value("PENDING"))
+                                .andExpect(jsonPath("$.totalPrice").value(25.00))
+                                .andExpect(jsonPath("$.deliveryAddress").value("Bob smith Home Address"));
+
+                List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+                Order order1 = orders.get(0);
+
+                orderStateMachine.updateOrderStatus(order1);
+                orderStateMachine.updateOrderStatus(order1);
+
+                Assertions.assertEquals(OrderStatus.READY_FOR_PICKUP, order1.getStatus());
+
+                mockMvc.perform(post("/couriers/orders/{id}/claim", order1.getId())
+                                .with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isAccepted());
+
+                Assertions.assertEquals(OrderStatus.PICKED_UP, order1.getStatus());
+                Assertions.assertEquals(courier, order1.getCourier());
+
+                Order claimedOrder = orderRepository.findById(Long.valueOf(order1.getId()))
+                                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                String code = claimedOrder.getPickupCode();
+
+                PickupCodeRequest codeRequest = new PickupCodeRequest(code);
+
+                mockMvc.perform(post("/couriers/orders/{id}/pickup", order1.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(codeRequest))
+                                .with(user(courier.getEmail()).roles("COURIER")))
+                                .andExpect(status().isAccepted());
+
+                Assertions.assertEquals(OrderStatus.IN_TRANSIT, order1.getStatus());
+                Assertions.assertEquals(courier, order1.getCourier());
+
+                orderStateMachine.updateTransit(order1);
+
+                Assertions.assertEquals(OrderStatus.DELIVERED, order1.getStatus());
+
+        }
 
 }

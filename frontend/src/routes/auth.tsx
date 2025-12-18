@@ -31,12 +31,12 @@ function AuthPage() {
   const handleSignup = async (data: SignupData) => {
     // Determine the user type endpoint based on userRole
     const userRole = data.userRole || 'CUSTOMER'
-    let userType: 'vendors' | 'customers' | 'drivers'
+    let userType: 'vendors' | 'customers' | 'couriers'
 
     if (userRole === 'VENDOR') {
       userType = 'vendors'
     } else if (userRole === 'COURIER') {
-      userType = 'drivers'
+      userType = 'couriers'
     } else {
       userType = 'customers'
     }

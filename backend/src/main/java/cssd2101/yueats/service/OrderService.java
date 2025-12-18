@@ -24,7 +24,7 @@ public class OrderService {
     private final RestaurantRepository restaurantRepository;
 
     public OrderService(OrderRepository orderRepo, MenuItemRepository menuRepo,
-                        UserRepository userRepo, RestaurantRepository restRepo) {
+            UserRepository userRepo, RestaurantRepository restRepo) {
         this.orderRepository = orderRepo;
         this.menuItemRepository = menuRepo;
         this.userRepository = userRepo;
@@ -33,7 +33,9 @@ public class OrderService {
 
     /**
      * Create an order by customer
-     * @param request The request sent from the client containing information to create an order
+     * 
+     * @param request The request sent from the client containing information to
+     *                create an order
      * @return The order saved in the database
      */
     @Transactional
@@ -86,24 +88,26 @@ public class OrderService {
     }
 
     /**
-     * Verify that the order has been picked up by the driver
+     * Verify that the order has been picked up by the courier
+     * 
      * @param orderId The order ID
-     * @param code The pickup code
-     * @param email The driver's email
+     * @param code    The pickup code
+     * @param email   The courier's email
      */
     public void verifyPickup(Integer orderId, String code, String email) {
-        Order order = orderRepository.findById(Long.valueOf(orderId)).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        Order order = orderRepository.findById(Long.valueOf(orderId))
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
         if (order.getStatus() != OrderStatus.PICKED_UP) {
-            throw new IllegalStateException("Order was not chosen by the delivery driver");
+            throw new IllegalStateException("Order was not chosen by the delivery courier");
         }
 
         if (!order.getPickupCode().equals(code)) {
-            throw new  IllegalStateException("Order code is incorrect");
+            throw new IllegalStateException("Order code is incorrect");
         }
 
-        if (!order.getDriver().getEmail().equals(email)) {
-            throw new  IllegalStateException("This order is not assigned to you");
+        if (!order.getCourier().getEmail().equals(email)) {
+            throw new IllegalStateException("This order is not assigned to you");
         }
 
         // If it passes the previous checks, set the status to in transit
@@ -115,14 +119,16 @@ public class OrderService {
 
     /**
      * Get all orders with the ready for pickup status
-     * @param userDetails The logged in delivery drivers details
+     * 
+     * @param userDetails The logged in delivery couriers details
      * @return List of orders that have the ready for pickup status
      */
     public List<Order> getReadyOrders(UserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        DeliveryDriver driver = (DeliveryDriver) user;
-        if (driver.getUserRole() != UserRole.COURIER) {
+        DeliveryCourier courier = (DeliveryCourier) user;
+        if (courier.getUserRole() != UserRole.COURIER) {
             throw new IllegalStateException("Only couriers can be picked up");
         }
         return orderRepository.findByStatus(OrderStatus.READY_FOR_PICKUP);
@@ -130,8 +136,9 @@ public class OrderService {
 
     /**
      * Claim an order
+     * 
      * @param orderId The order ID
-     * @param email The delivery driver's email
+     * @param email   The delivery courier's email
      * @return The order that was claimed
      */
     @Transactional
@@ -141,7 +148,8 @@ public class OrderService {
         }
 
         // Find order by the given id
-        Order order = orderRepository.findById(Long.valueOf(orderId)).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        Order order = orderRepository.findById(Long.valueOf(orderId))
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
         if (order.getStatus() != OrderStatus.READY_FOR_PICKUP) {
             throw new IllegalStateException("Order status is not ready yet");
@@ -149,11 +157,11 @@ public class OrderService {
         // Find user with the given email
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Convert type to delivery driver
-        DeliveryDriver driver = (DeliveryDriver) user;
+        // Convert type to delivery courier
+        DeliveryCourier courier = (DeliveryCourier) user;
 
-        // Update order details with driver, new status
-        order.setDriver(driver);
+        // Update order details with courier, new status
+        order.setCourier(courier);
         order.setStatus(OrderStatus.PICKED_UP);
         order.setLastUpdated(LocalDateTime.now());
 

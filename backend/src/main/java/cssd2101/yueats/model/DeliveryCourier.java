@@ -14,5 +14,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @DiscriminatorValue("COURIER")
 @NoArgsConstructor
-public class DeliveryDriver extends User {
+public class DeliveryCourier extends User {
 }

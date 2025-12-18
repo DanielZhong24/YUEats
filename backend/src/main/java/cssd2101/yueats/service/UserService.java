@@ -4,7 +4,7 @@ import cssd2101.yueats.dto.CustomerSignupRequest;
 import cssd2101.yueats.dto.VendorSignupRequest;
 import cssd2101.yueats.factory.UserFactory;
 import cssd2101.yueats.model.Customer;
-import cssd2101.yueats.model.DeliveryDriver;
+import cssd2101.yueats.model.DeliveryCourier;
 import cssd2101.yueats.model.Vendor;
 import cssd2101.yueats.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,7 +16,8 @@ public class UserService {
     private final UserFactory userFactory;
     private final BCryptPasswordEncoder encoder;
 
-    public UserService(UserRepository userRepository, UserFactory userFactory, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder hashConfig) {
+    public UserService(UserRepository userRepository, UserFactory userFactory,
+            BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder hashConfig) {
         this.userRepository = userRepository;
         this.userFactory = userFactory;
         this.encoder = bCryptPasswordEncoder;
@@ -24,33 +25,36 @@ public class UserService {
 
     /**
      * Register a customer
+     * 
      * @param dto The information from the request
      * @return The new customer saved in the database
      */
-    public Customer registerCustomer(CustomerSignupRequest dto){
-        if(userRepository.existsByEmail(dto.email())){
+    public Customer registerCustomer(CustomerSignupRequest dto) {
+        if (userRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        // Hash the password using bcrypt, and create the customer with the hashed password
+        // Hash the password using bcrypt, and create the customer with the hashed
+        // password
         String hashed = encoder.encode(dto.password());
         Customer customer = userFactory.createCustomer(dto, hashed);
-
 
         return userRepository.save(customer);
     }
 
     /**
      * Register a vendor
+     * 
      * @param dto The information from the request
      * @return The new vendor saved in the database
      */
-    public Vendor registerVendor(VendorSignupRequest dto){
-        if(userRepository.existsByEmail(dto.email())){
+    public Vendor registerVendor(VendorSignupRequest dto) {
+        if (userRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        // Hash the password using bcrypt, and create the vendor with the hashed password
+        // Hash the password using bcrypt, and create the vendor with the hashed
+        // password
         String hashed = encoder.encode(dto.password());
         Vendor vendor = userFactory.createVendor(dto, hashed);
 
@@ -58,20 +62,22 @@ public class UserService {
     }
 
     /**
-     * Register a delivery driver
+     * Register a delivery courier
+     * 
      * @param dto The information from the request
-     * @return The new delivery driver saved in the database
+     * @return The new delivery courier saved in the database
      */
-    public DeliveryDriver registerDriver(CustomerSignupRequest dto){
-        if (userRepository.existsByEmail(dto.email())){
+    public DeliveryCourier registerCourier(CustomerSignupRequest dto) {
+        if (userRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        // Hash the password using bcrypt, and create the delivery driver with the hashed password
+        // Hash the password using bcrypt, and create the delivery courier with the
+        // hashed password
         String hashed = encoder.encode(dto.password());
-        DeliveryDriver driver = userFactory.createDriver(dto, hashed);
+        DeliveryCourier courier = userFactory.createCourier(dto, hashed);
 
-        return userRepository.save(driver);
+        return userRepository.save(courier);
     }
 
 }

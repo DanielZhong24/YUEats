@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS orders (
     id IDENTITY PRIMARY KEY,
     user_id INTEGER,
     restaurant_id INTEGER,
-    driver_id INTEGER,
+    courier_id INTEGER,
     order_date TIMESTAMP,
     last_updated TIMESTAMP,
     status VARCHAR(255),
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS orders (
     pickup_code VARCHAR(10),
     FOREIGN KEY (user_id) REFERENCES app_user(id),
     FOREIGN KEY (restaurant_id) REFERENCES restaurants(id),
-    FOREIGN KEY (driver_id) REFERENCES app_user(id)
+    FOREIGN KEY (courier_id) REFERENCES app_user(id)
 );
 
 CREATE TABLE IF NOT EXISTS order_details (

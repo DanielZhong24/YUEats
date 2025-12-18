@@ -4,7 +4,7 @@
 
 ## Overview
 
-YUEats is a food delivery platform with three main user types: Customers, Vendors, and Delivery Drivers (Couriers). The backend uses Spring Security with session-based authentication and CORS configured for `http://localhost:3000`.
+YUEats is a food delivery platform with three main user types: Customers, Vendors, and Couriers. The backend uses Spring Security with session-based authentication and CORS configured for `http://localhost:3000`.
 
 ---
 
@@ -29,7 +29,7 @@ YUEats is a food delivery platform with three main user types: Customers, Vendor
 
 - `/vendors/**` - Requires `ROLE_VENDOR`
 - `/customers/**` - Requires `ROLE_CUSTOMER`
-- `/drivers/**` - Requires `ROLE_COURIER`
+- `/couriers/**` - Requires `ROLE_COURIER`
 - All other endpoints require authentication
 
 ### Login/Logout
@@ -61,7 +61,7 @@ All users inherit from the `User` base class using Single Table Inheritance (dis
 User (Abstract Base)
 ├── Customer
 ├── Vendor (has businessName, owns Restaurants)
-├── DeliveryDriver (Courier)
+├── DeliveryCourier (Courier)
 └── Admin
 ```
 
@@ -111,7 +111,7 @@ Inherits all User properties, adds:
 - Manage menu items
 - View orders for their restaurants (not yet implemented)
 
-### DeliveryDriver (Courier)
+### DeliveryCourier (Courier)
 
 Inherits all User properties. No additional fields.
 
@@ -198,7 +198,7 @@ Inherits all User properties. No additional fields.
   "status": "PENDING",
   "totalPrice": 14.49,
   "deliveryAddress": "Alice Home Address, Apt 4B",
-  "driver": null,
+  "courier": null,
   "pickupCode": null,
   "orderDetails": [
     {
@@ -223,7 +223,7 @@ Inherits all User properties. No additional fields.
 - `status` (OrderStatus enum)
 - `totalPrice` (BigDecimal)
 - `deliveryAddress` (String)
-- `driver` (DeliveryDriver reference, nullable)
+- `courier` (DeliveryCourier reference, nullable)
 - `pickupCode` (String, max 10 chars, nullable)
 - `orderDetails` (List<OrderDetail>)
 
@@ -254,8 +254,8 @@ Inherits all User properties. No additional fields.
 enum OrderStatus {
     PENDING,          // Order created
     PREPARING,        // Restaurant preparing food
-    READY_FOR_PICKUP, // Ready for driver to claim
-    PICKED_UP,        // Driver has picked up
+    READY_FOR_PICKUP, // Ready for courier to claim
+    PICKED_UP,        // Courier has picked up
     IN_TRANSIT,       // Being delivered
     DELIVERED,        // Completed
     CANCELLED         // Cancelled
@@ -381,12 +381,12 @@ Content-Type: application/json
 
 ---
 
-### Driver Endpoints
+### Courier Endpoints
 
-#### Driver Signup
+#### Courier Signup
 
 ```http
-POST /drivers
+POST /couriers
 Content-Type: application/json
 Authorization: Not required for signup
 ```
@@ -395,7 +395,7 @@ Authorization: Not required for signup
 
 ```json
 {
-  "email": "driver@example.com",
+  "email": "courier@example.com",
   "firstName": "Mike",
   "lastName": "Courier",
   "phoneNumber": "5551112222",
@@ -408,7 +408,7 @@ Authorization: Not required for signup
 #### Get Available Orders
 
 ```http
-GET /drivers/orders/available
+GET /couriers/orders/available
 Authorization: Required (ROLE_COURIER)
 ```
 
@@ -428,7 +428,7 @@ Authorization: Required (ROLE_COURIER)
     "status": "READY_FOR_PICKUP",
     "totalPrice": 25.5,
     "deliveryAddress": "456 Main St",
-    "driver": null,
+    "courier": null,
     "pickupCode": null,
     "orderDetails": [
       /* order items */
@@ -440,12 +440,12 @@ Authorization: Required (ROLE_COURIER)
 **Notes:**
 
 - Only returns orders with status `READY_FOR_PICKUP`
-- Driver must be authenticated
+- Courier must be authenticated
 
 #### Claim Order
 
 ```http
-POST /drivers/orders/{id}/claim
+POST /couriers/orders/{id}/claim
 Authorization: Required (ROLE_COURIER)
 ```
 
@@ -465,12 +465,12 @@ Authorization: Required (ROLE_COURIER)
 
 - Order status changes to `PICKED_UP`
 - Pickup code is generated (10 chars max)
-- Driver is assigned to the order
+- Courier is assigned to the order
 
 #### Pickup Order (Verify Code)
 
 ```http
-POST /drivers/orders/{id}/pickup
+POST /couriers/orders/{id}/pickup
 Authorization: Required (ROLE_COURIER)
 Content-Type: application/json
 ```
@@ -622,7 +622,7 @@ Authorization: Required
   "status": "PENDING",
   "totalPrice": 24.48,
   "deliveryAddress": "123 Customer St, Apt 5",
-  "driver": null,
+  "courier": null,
   "pickupCode": null,
   "orderDetails": [
     {
@@ -791,7 +791,7 @@ Authorization: Required
 
 - [ ] Customer signup form with validation
 - [ ] Vendor signup form with business name field
-- [ ] Driver signup form
+- [ ] Courier signup form
 - [ ] Display validation errors from backend
 - [ ] Password strength indicator
 - [ ] Auto-login after successful signup (or redirect to login)
@@ -816,14 +816,14 @@ Authorization: Required
 - [ ] View incoming orders (needs GET /vendors/orders - NOT YET IMPLEMENTED)
 - [ ] Update order status (needs PATCH /orders/{id}/status - NOT YET IMPLEMENTED)
 
-### Driver Features
+### Courier Features
 
-- [ ] Driver dashboard
-- [ ] View available orders (GET /drivers/orders/available) ✓
-- [ ] Claim order button (POST /drivers/orders/{id}/claim) ✓
-- [ ] Pickup verification with code input (POST /drivers/orders/{id}/pickup) ✓
+- [ ] Courier dashboard
+- [ ] View available orders (GET /couriers/orders/available) ✓
+- [ ] Claim order button (POST /couriers/orders/{id}/claim) ✓
+- [ ] Pickup verification with code input (POST /couriers/orders/{id}/pickup) ✓
 - [ ] View current delivery (needs endpoint - NOT YET IMPLEMENTED)
-- [ ] Mark order as delivered (needs POST /drivers/orders/{id}/complete - NOT YET IMPLEMENTED)
+- [ ] Mark order as delivered (needs POST /couriers/orders/{id}/complete - NOT YET IMPLEMENTED)
 - [ ] View delivery history (needs endpoint - NOT YET IMPLEMENTED)
 
 ### Data Types/Interfaces (TypeScript)
@@ -852,7 +852,7 @@ interface Vendor extends User {
   ownedRestaurants?: Restaurant[];
 }
 
-interface DeliveryDriver extends User {
+interface DeliveryCourier extends User {
   userRole: "COURIER";
 }
 
@@ -901,7 +901,7 @@ interface Order {
   status: OrderStatus;
   totalPrice: number;
   deliveryAddress: string;
-  driver?: DeliveryDriver | null;
+  courier?: DeliveryCourier | null;
   pickupCode?: string | null;
   orderDetails: OrderDetail[];
 }
@@ -967,8 +967,8 @@ interface PickupCodeRequest {
 // vendors.ts
 - signupVendor(data: VendorSignupRequest): Promise<Vendor>
 
-// drivers.ts
-- signupDriver(data: SignupRequest): Promise<DeliveryDriver>
+// couriers.ts
+- signupCourier(data: SignupRequest): Promise<DeliveryCourier>
 - getAvailableOrders(): Promise<Order[]>
 - claimOrder(orderId: number): Promise<string> // returns pickup code
 - verifyPickup(orderId: number, code: string): Promise<void>
@@ -993,9 +993,9 @@ interface PickupCodeRequest {
 8. **PUT /restaurants/{id}** - Update restaurant details
 9. **PUT /menu-items/{id}** - Update menu item
 10. **DELETE /menu-items/{id}** - Delete menu item
-11. **POST /drivers/orders/{id}/complete** - Mark delivery as complete
-12. **GET /drivers/orders/active** - Get driver's current/active deliveries
-13. **GET /drivers/orders/history** - Get driver's delivery history
+11. **POST /couriers/orders/{id}/complete** - Mark delivery as complete
+12. **GET /couriers/orders/active** - Get courier's current/active deliveries
+13. **GET /couriers/orders/history** - Get courier's delivery history
 
 ### Error Handling
 
@@ -1037,8 +1037,8 @@ interface PickupCodeRequest {
 
 4. **Pickup Code:**
 
-   - Generated when driver claims order
-   - Driver receives code in response
+   - Generated when courier claims order
+   - Courier receives code in response
    - Vendor/Restaurant should display code to verify pickup
    - Code verification prevents unauthorized pickups
 
@@ -1054,7 +1054,7 @@ interface PickupCodeRequest {
    - Vendors own multiple Restaurants
    - Restaurants have multiple MenuItems
    - Orders contain OrderDetails (line items)
-   - Orders link to Customer, Restaurant, and optionally Driver
+   - Orders link to Customer, Restaurant, and optionally Courier
 
 7. **Current Limitations:**
 
@@ -1097,7 +1097,7 @@ interface PickupCodeRequest {
 
 - Initial implementation
 - Basic CRUD for users, restaurants, menu items, orders
-- Driver order claiming and pickup workflow
+- Courier order claiming and pickup workflow
 - Session-based authentication
 
 ---

@@ -18,7 +18,7 @@ const checkBackendUrl = () => {
 
 // Core API functions
 const signupApi = async (
-  userType: 'customers' | 'vendors' | 'drivers',
+  userType: 'customers' | 'vendors' | 'couriers',
   payload: SignupPayload | VendorSignupPayload | CourierSignupPayload,
 ): Promise<SignupResponse> => {
   checkBackendUrl()
@@ -94,7 +94,7 @@ export function useSignupMutation() {
       userType,
       payload,
     }: {
-      userType: 'customers' | 'vendors' | 'drivers'
+      userType: 'customers' | 'vendors' | 'couriers'
       payload: SignupPayload | VendorSignupPayload | CourierSignupPayload
     }) => signupApi(userType, payload),
     onSuccess: async (_data, variables) => {
