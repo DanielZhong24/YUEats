@@ -1,18 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useMemo } from 'react'
-import { 
-  Plus, Search, Edit2, Trash2, 
-  Image as ImageIcon, Loader2, ChevronDown, Utensils 
+import {
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
+  Image as ImageIcon,
+  Loader2,
+  ChevronDown,
+  Utensils,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import CreateMenuModal from '@/components/vendor/CreateMenuModal'
 import ConfirmDeleteModal from '@/components/ui/ConfirmDeleteModal'
-import { 
-  useRestaurantMenu, 
-  useMyRestaurants, 
+import {
+  useRestaurantMenu,
+  useMyRestaurants,
   useDeleteMenuItem,
-  useUpdateMenuItem 
+  useUpdateMenuItem,
 } from '@/hooks/useVendorApi'
 import { useVendorContext } from '@/context/VendorContext'
 
@@ -21,14 +27,16 @@ export const Route = createFileRoute('/_authenticated/vendor/menu')({
 })
 
 function MenuPage() {
-  const { data: myRestaurants, isLoading: isLoadingRestaurants } = useMyRestaurants()
+  const { data: myRestaurants, isLoading: isLoadingRestaurants } =
+    useMyRestaurants()
   const { activeRestaurantId } = useVendorContext()
-  const activeRestaurant = myRestaurants?.find(r => r.id === activeRestaurantId)
+  const activeRestaurant = myRestaurants?.find(
+    (r) => r.id === activeRestaurantId,
+  )
 
-  const { 
-    data: menuItems, 
-    isLoading: isLoadingMenu, 
-  } = useRestaurantMenu(activeRestaurantId || 0) 
+  const { data: menuItems, isLoading: isLoadingMenu } = useRestaurantMenu(
+    activeRestaurantId || 0,
+  )
 
   const deleteItem = useDeleteMenuItem()
   const updateItem = useUpdateMenuItem()
@@ -36,7 +44,10 @@ function MenuPage() {
   // --- Local State ---
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
-  const [itemToDelete, setItemToDelete] = useState<{id: number, name: string} | null>(null)
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: number
+    name: string
+  } | null>(null)
   const [search, setSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState('All')
 
@@ -67,27 +78,32 @@ function MenuPage() {
           setItemToDelete(null)
         },
         onError: () => {
-          toast.error("Failed to delete item. Please try again.")
-        }
-      }
+          toast.error('Failed to delete item. Please try again.')
+        },
+      },
     )
   }
 
   const handleToggleAvailability = (item: any) => {
     if (!activeRestaurantId) return
-    const itemId = item.id || item.itemId; 
+    const itemId = item.id || item.itemId
     const currentStatus = item.available ?? item.isAvailable ?? true
     const newStatus = !currentStatus
 
-    updateItem.mutate({
-      restaurantId: activeRestaurantId,
-      itemId: itemId,
-      data: { ...item, isAvailable: newStatus, available: newStatus }
-    }, {
-      onSuccess: () => {
-        toast.info(`${item.itemName} status updated to ${newStatus ? 'Available' : 'Sold Out'}`)
-      }
-    })
+    updateItem.mutate(
+      {
+        restaurantId: activeRestaurantId,
+        itemId: itemId,
+        data: { ...item, isAvailable: newStatus, available: newStatus },
+      },
+      {
+        onSuccess: () => {
+          toast.info(
+            `${item.itemName} status updated to ${newStatus ? 'Available' : 'Sold Out'}`,
+          )
+        },
+      },
+    )
   }
 
   // --- Logic & Filtering ---
@@ -95,14 +111,20 @@ function MenuPage() {
   const itemsToDisplay = Array.isArray(menuItems) ? menuItems : []
 
   const categories = useMemo(() => {
-    return ['All', ...new Set(itemsToDisplay.map((i: any) => i.category || 'Main'))]
+    return [
+      'All',
+      ...new Set(itemsToDisplay.map((i: any) => i.category || 'Main')),
+    ]
   }, [itemsToDisplay])
 
   const filteredItems = useMemo(() => {
     return itemsToDisplay.filter((item: any) => {
-      const nameToSearch = item.itemName || ""; 
-      const matchesSearch = nameToSearch.toLowerCase().includes(search.toLowerCase())
-      const matchesCategory = filterCategory === 'All' || item.category === filterCategory
+      const nameToSearch = item.itemName || ''
+      const matchesSearch = nameToSearch
+        .toLowerCase()
+        .includes(search.toLowerCase())
+      const matchesCategory =
+        filterCategory === 'All' || item.category === filterCategory
       return matchesSearch && matchesCategory
     })
   }, [itemsToDisplay, search, filterCategory])
@@ -123,11 +145,11 @@ function MenuPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <Utensils className="text-red-500" size={24} />
-            Menu: {activeRestaurant?.restaurantName || 'Select a Restaurant'}
+            Menu: {activeRestaurant?.name || 'Select a Restaurant'}
           </h1>
         </div>
-        
-        <button 
+
+        <button
           onClick={handleAddNew}
           className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm active:scale-95"
         >
@@ -138,8 +160,11 @@ function MenuPage() {
       {/* Filters */}
       <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-          <input 
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            size={20}
+          />
+          <input
             type="text"
             placeholder="Search dishes..."
             value={search}
@@ -147,15 +172,22 @@ function MenuPage() {
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-red-500 outline-none transition-all"
           />
         </div>
-        <div className="relative min-w-[200px]">
-          <select 
+        <div className="relative min-w-50">
+          <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
             className="w-full pl-4 pr-10 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white appearance-none cursor-pointer focus:ring-2 focus:ring-red-500 outline-none"
           >
-            {categories.map((cat: string) => <option key={cat} value={cat}>{cat}</option>)}
+            {categories.map((cat: string) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+          <ChevronDown
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            size={16}
+          />
         </div>
       </div>
 
@@ -175,15 +207,32 @@ function MenuPage() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {filteredItems.length > 0 ? (
                 filteredItems.map((item: any) => (
-                  <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 group transition-colors">
+                  <tr
+                    key={item.id}
+                    className="hover:bg-slate-50 dark:hover:bg-slate-700/30 group transition-colors"
+                  >
                     <td className="p-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-900 border dark:border-slate-700 overflow-hidden flex-shrink-0">
-                          {item.imgUrl ? <img src={item.imgUrl} className="w-full h-full object-cover" /> : <ImageIcon size={20} className="m-auto mt-3 text-slate-400" />}
+                        <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-900 border dark:border-slate-700 overflow-hidden shrink-0">
+                          {item.imgUrl ? (
+                            <img
+                              src={item.imgUrl}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <ImageIcon
+                              size={20}
+                              className="m-auto mt-3 text-slate-400"
+                            />
+                          )}
                         </div>
                         <div className="min-w-0">
-                          <div className="font-bold text-slate-900 dark:text-white truncate">{item.itemName}</div>
-                          <div className="text-sm text-slate-500 truncate max-w-[250px]">{item.description}</div>
+                          <div className="font-bold text-slate-900 dark:text-white truncate">
+                            {item.itemName}
+                          </div>
+                          <div className="text-sm text-slate-500 truncate max-w-62.5">
+                            {item.description}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -199,9 +248,9 @@ function MenuPage() {
                       <button
                         onClick={() => handleToggleAvailability(item)}
                         className={`px-3 py-1 rounded-full text-xs font-bold transition-colors border ${
-                          item.available 
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' 
-                          : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-900 dark:text-slate-500 dark:border-slate-700'
+                          item.available
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+                            : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-900 dark:text-slate-500 dark:border-slate-700'
                         }`}
                       >
                         {item.available ? 'Available' : 'Sold Out'}
@@ -209,14 +258,19 @@ function MenuPage() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
-                          onClick={() => handleEdit(item)} 
+                        <button
+                          onClick={() => handleEdit(item)}
                           className="p-2 text-slate-400 hover:text-red-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
                         >
                           <Edit2 size={18} />
                         </button>
-                        <button 
-                          onClick={() => setItemToDelete({ id: item.id, name: item.itemName })} 
+                        <button
+                          onClick={() =>
+                            setItemToDelete({
+                              id: item.id,
+                              name: item.itemName,
+                            })
+                          }
                           className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                         >
                           <Trash2 size={18} />
@@ -231,7 +285,12 @@ function MenuPage() {
                     <div className="flex flex-col items-center gap-3 text-slate-400">
                       <Utensils size={48} className="opacity-10" />
                       <p className="text-lg font-medium">No menu items found</p>
-                      <button onClick={handleAddNew} className="text-red-500 hover:underline text-sm font-bold">Add your first dish</button>
+                      <button
+                        onClick={handleAddNew}
+                        className="text-red-500 hover:underline text-sm font-bold"
+                      >
+                        Add your first dish
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -242,14 +301,14 @@ function MenuPage() {
       </div>
 
       {/* Nice Modals */}
-      <CreateMenuModal 
-        isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
+      <CreateMenuModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
         restaurantId={activeRestaurantId || 0}
         editItem={editingItem}
       />
 
-      <ConfirmDeleteModal 
+      <ConfirmDeleteModal
         isOpen={!!itemToDelete}
         onClose={() => setItemToDelete(null)}
         onConfirm={handleConfirmDelete}

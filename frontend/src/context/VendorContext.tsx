@@ -3,16 +3,20 @@ import * as vendorService from '@/services/vendor'
 import { useQuery } from '@tanstack/react-query'
 
 interface VendorContextType {
-  activeRestaurantId: number | null
-  setActiveRestaurantId: (id: number | null) => void // Allow null
+  activeRestaurantId: string | null
+  setActiveRestaurantId: (id: string | null) => void // Allow null
   restaurants: any[]
   isLoading: boolean
 }
 
-export const VendorContext = createContext<VendorContextType | undefined>(undefined)
+export const VendorContext = createContext<VendorContextType | undefined>(
+  undefined,
+)
 
 export function VendorProvider({ children }: { children: React.ReactNode }) {
-  const [activeRestaurantId, setActiveRestaurantId] = useState<number | null>(null)
+  const [activeRestaurantId, setActiveRestaurantId] = useState<string | null>(
+    null,
+  )
 
   const { data: restaurants = [], isLoading } = useQuery({
     queryKey: ['my-restaurants'],
@@ -27,12 +31,12 @@ export function VendorProvider({ children }: { children: React.ReactNode }) {
   }, [restaurants, activeRestaurantId])
 
   return (
-    <VendorContext.Provider 
-      value={{ 
-        activeRestaurantId, 
-        setActiveRestaurantId, 
-        restaurants, 
-        isLoading 
+    <VendorContext.Provider
+      value={{
+        activeRestaurantId,
+        setActiveRestaurantId,
+        restaurants,
+        isLoading,
       }}
     >
       {children}

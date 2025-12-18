@@ -1,10 +1,10 @@
-import { Link } from "@tanstack/react-router"
-import { Button } from "./button"
+import { Link } from '@tanstack/react-router'
+import { Button } from './button'
 import { useAuth } from '@/auth/provider' // Import your auth hook
 
 export function Hero({
-  title = "Delicious food, delivered fast",
-  subtitle = "Find your favorite local restaurants and get food delivered to your door.",
+  title = 'Delicious food, delivered fast',
+  subtitle = 'Find your favorite local restaurants and get food delivered to your door.',
 }) {
   const { user } = useAuth() // Get the current user
 
@@ -35,13 +35,17 @@ export function Hero({
             ) : (
               /* GUEST: Show both buttons */
               <>
-                <Link to="/auth" search={{ mode: 'signup' }}>
+                <Link to="/auth" search={{ mode: 'signup', redirect: '/' }}>
                   <Button size="lg" className="bg-red-600 hover:bg-red-700">
                     Get started
                   </Button>
                 </Link>
-                <Link to="/auth" search={{ mode: 'login' }}>
-                  <Button size="lg" variant="outline" className="hover:bg-white/90">
+                <Link to="/auth" search={{ mode: 'login', redirect: '/' }}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="hover:bg-white/90"
+                  >
                     Log in
                   </Button>
                 </Link>

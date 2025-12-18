@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
     if (!context.auth.isAuthenticated) {
       throw redirect({
         to: '/auth',
-        search: { redirect: window.location.pathname },
+        search: { redirect: window.location.pathname, mode: 'login' },
       })
     }
   },

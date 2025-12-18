@@ -15,30 +15,32 @@ export default function VendorSettingsPage() {
   // --- Local State for Modal ---
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
-  const selectedRestaurant = restaurants?.find(r => r.id === activeRestaurantId)
+  const selectedRestaurant = restaurants?.find(
+    (r) => r.id === activeRestaurantId?.toString(),
+  )
 
   const handleConfirmDelete = () => {
     if (!selectedRestaurant) return
 
     deleteRestaurant(selectedRestaurant.id, {
       onSuccess: () => {
-        toast.success(`"${selectedRestaurant.restaurantName}" has been deleted.`)
-        
+        toast.success(`"${selectedRestaurant.name}" has been deleted.`)
+
         // 1. Clear selection from local storage
         localStorage.removeItem('vendor_active_restaurant')
-        
+
         // 2. Close modal
         setIsDeleteModalOpen(false)
-        
+
         // 3. Redirect and refresh
-        navigate({ to: '/vendor/' })
+        navigate({ to: '/vendor' })
         window.location.reload()
       },
       onError: (error: any) => {
-        toast.error("Failed to delete restaurant", {
-          description: error.message || "Please try again later."
+        toast.error('Failed to delete restaurant', {
+          description: error.message || 'Please try again later.',
         })
-      }
+      },
     })
   }
 
@@ -62,9 +64,12 @@ export default function VendorSettingsPage() {
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-8 animate-in fade-in duration-500">
       <header>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Settings</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+          Settings
+        </h1>
         <p className="text-slate-500 mt-1">
-          Manage configuration for <span className="font-semibold">{selectedRestaurant.restaurantName}</span>
+          Manage configuration for{' '}
+          <span className="font-semibold">{selectedRestaurant.name}</span>
         </p>
       </header>
 
@@ -72,16 +77,26 @@ export default function VendorSettingsPage() {
       <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 shadow-sm overflow-hidden">
         <div className="p-6 border-b dark:border-slate-700 flex items-center gap-3">
           <Building2 className="text-blue-500" size={20} />
-          <h2 className="font-semibold text-lg dark:text-white">General Information</h2>
+          <h2 className="font-semibold text-lg dark:text-white">
+            General Information
+          </h2>
         </div>
         <div className="p-6 grid grid-cols-2 gap-6">
           <div>
-            <label className="text-xs font-bold uppercase text-slate-400">Restaurant Name</label>
-            <p className="text-lg font-medium dark:text-slate-200">{selectedRestaurant.restaurantName}</p>
+            <label className="text-xs font-bold uppercase text-slate-400">
+              Restaurant Name
+            </label>
+            <p className="text-lg font-medium dark:text-slate-200">
+              {selectedRestaurant.name}
+            </p>
           </div>
           <div>
-            <label className="text-xs font-bold uppercase text-slate-400">Address</label>
-            <p className="text-lg font-medium dark:text-slate-200">{selectedRestaurant.address}</p>
+            <label className="text-xs font-bold uppercase text-slate-400">
+              Address
+            </label>
+            <p className="text-lg font-medium dark:text-slate-200">
+              {selectedRestaurant.address}
+            </p>
           </div>
         </div>
       </div>
@@ -94,13 +109,15 @@ export default function VendorSettingsPage() {
             Danger Zone
           </h2>
         </div>
-        
+
         <div className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
-            <p className="font-bold text-red-900 dark:text-red-200">Delete this restaurant</p>
+            <p className="font-bold text-red-900 dark:text-red-200">
+              Delete this restaurant
+            </p>
             <p className="text-sm text-red-700/70 dark:text-slate-400 max-w-md">
-              Deleting this restaurant will remove all menu items, orders, and data. 
-              This action is permanent and cannot be undone.
+              Deleting this restaurant will remove all menu items, orders, and
+              data. This action is permanent and cannot be undone.
             </p>
           </div>
 
@@ -109,18 +126,22 @@ export default function VendorSettingsPage() {
             disabled={isPending}
             className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all disabled:opacity-50 active:scale-95"
           >
-            {isPending ? <Loader2 className="animate-spin" size={18} /> : <Trash2 size={18} />}
+            {isPending ? (
+              <Loader2 className="animate-spin" size={18} />
+            ) : (
+              <Trash2 size={18} />
+            )}
             Delete Restaurant
           </button>
         </div>
       </div>
 
       {/* Custom Confirmation Modal */}
-      <ConfirmDeleteModal 
+      <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        targetName={selectedRestaurant.restaurantName}
+        targetName={selectedRestaurant.name}
         isLoading={isPending}
       />
     </div>
