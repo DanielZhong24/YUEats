@@ -145,7 +145,7 @@ function MenuPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <Utensils className="text-red-500" size={24} />
-            Menu: {activeRestaurant?.name || 'Select a Restaurant'}
+            Menu: {activeRestaurant?.restaurantName || 'Select a Restaurant'}
           </h1>
         </div>
 

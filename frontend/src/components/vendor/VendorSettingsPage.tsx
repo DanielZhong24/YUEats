@@ -16,7 +16,7 @@ export default function VendorSettingsPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   const selectedRestaurant = restaurants?.find(
-    (r) => r.id === activeRestaurantId?.toString(),
+    (r) => r.id === activeRestaurantId,
   )
 
   const handleConfirmDelete = () => {
@@ -24,7 +24,9 @@ export default function VendorSettingsPage() {
 
     deleteRestaurant(selectedRestaurant.id, {
       onSuccess: () => {
-        toast.success(`"${selectedRestaurant.name}" has been deleted.`)
+        toast.success(
+          `"${selectedRestaurant.restaurantName}" has been deleted.`,
+        )
 
         // 1. Clear selection from local storage
         localStorage.removeItem('vendor_active_restaurant')
@@ -69,7 +71,9 @@ export default function VendorSettingsPage() {
         </h1>
         <p className="text-slate-500 mt-1">
           Manage configuration for{' '}
-          <span className="font-semibold">{selectedRestaurant.name}</span>
+          <span className="font-semibold">
+            {selectedRestaurant.restaurantName}
+          </span>
         </p>
       </header>
 
@@ -87,7 +91,7 @@ export default function VendorSettingsPage() {
               Restaurant Name
             </label>
             <p className="text-lg font-medium dark:text-slate-200">
-              {selectedRestaurant.name}
+              {selectedRestaurant.restaurantName}
             </p>
           </div>
           <div>
@@ -141,7 +145,7 @@ export default function VendorSettingsPage() {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        targetName={selectedRestaurant.name}
+        targetName={selectedRestaurant.restaurantName}
         isLoading={isPending}
       />
     </div>
