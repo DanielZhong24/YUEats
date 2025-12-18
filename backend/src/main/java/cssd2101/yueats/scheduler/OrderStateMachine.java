@@ -20,7 +20,6 @@ public class OrderStateMachine {
     private final OrderRepository orderRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-
     public OrderStateMachine(OrderRepository orderRepository, ApplicationEventPublisher applicationEventPublisher) {
         this.orderRepository = orderRepository;
         this.applicationEventPublisher = applicationEventPublisher;
@@ -28,6 +27,7 @@ public class OrderStateMachine {
 
     /**
      * Updates the order status to the next status
+     * 
      * @param order The order with the new status
      */
     public void updateOrderStatus(Order order) {
@@ -35,14 +35,16 @@ public class OrderStateMachine {
         OrderStatus orderStatus = order.getStatus();
         OrderStatus nextStatus = orderStatusMap.get(orderStatus);
 
-        if (nextStatus == null) return;
+        if (nextStatus == null)
+            return;
         // Set the orders new status and when it was last updated
         order.setStatus(nextStatus);
         order.setLastUpdated(LocalDateTime.now());
 
-        // If its status is ready for pickup, generate a pickup code to verify afterwards
+        // If its status is ready for pickup, generate a pickup code to verify
+        // afterwards
         if (nextStatus == OrderStatus.READY_FOR_PICKUP) {
-            order.setPickupCode(UUID.randomUUID().toString().substring(0,6));
+            order.setPickupCode(UUID.randomUUID().toString().substring(0, 6));
         }
 
         // Save and create a new event
@@ -52,6 +54,7 @@ public class OrderStateMachine {
 
     /**
      * Update the order if it is in transit
+     * 
      * @param order The order with the new status
      */
     public void updateTransit(Order order) {
@@ -61,5 +64,14 @@ public class OrderStateMachine {
 
         orderRepository.save(order);
         applicationEventPublisher.publishEvent(new OrderStatusEvent(order.getId(), OrderStatus.DELIVERED));
+    }
+
+    public void startPreparation(Order order) {
+        if (order.getStatus() == OrderStatus.PENDING) {
+            order.setStatus(OrderStatus.PREPARING);
+            order.setLastUpdated(LocalDateTime.now());
+            orderRepository.save(order);
+            applicationEventPublisher.publishEvent(new OrderStatusEvent(order.getId(), OrderStatus.PREPARING));
+        }
     }
 }

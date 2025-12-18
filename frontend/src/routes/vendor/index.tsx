@@ -1,14 +1,7 @@
+// routes/vendor/index.tsx
 import { createFileRoute } from '@tanstack/react-router'
+import Dashboard from '@/components/vendor/Dashboard/Dashboard'
 
 export const Route = createFileRoute('/vendor/')({
-  component: VendorLayout,
+  component: Dashboard,
 })
-
-function VendorLayout() {
-  return (
-    <div>
-      <div>Should be home page of Vendor</div>
-      <div>If !user, go to signup automatically</div>
-    </div>
-  )
-}

@@ -10,7 +10,6 @@ import cssd2101.yueats.repository.RestaurantRepository;
 
 import java.math.BigDecimal;
 
-
 @Component
 public class RestaurantBuilder {
 
@@ -22,6 +21,7 @@ public class RestaurantBuilder {
 
     /**
      * Creates a restaurant from the data sent from the client
+     * 
      * @param dto
      * @param owner
      * @return Restaurant
@@ -32,6 +32,7 @@ public class RestaurantBuilder {
                 .restaurantName(dto.restaurantName())
                 .owner(owner)
                 .address(dto.address())
+                .bannerImgUrl(dto.bannerImgUrl())
                 .build();
         // Adds the restaurant to the list of owned restaurants by the owner
         owner.addRestaurant(restaurant);
@@ -40,6 +41,7 @@ public class RestaurantBuilder {
 
     /**
      * Creates a menu item from the request sent from the client
+     * 
      * @param dto
      * @param restaurantId
      * @return menuItem, the Menu item created for the specific restaurant
@@ -49,11 +51,13 @@ public class RestaurantBuilder {
                 .orElseThrow(() -> new RuntimeException("restaurant not found"));
 
         // Builds the menu item
-        MenuItem menuItem =  MenuItem.builder()
+        MenuItem menuItem = MenuItem.builder()
                 .itemName(dto.itemName())
                 .price(BigDecimal.valueOf(dto.price()))
                 .description(dto.description())
                 .restaurant(restaurant)
+                .imgUrl(dto.imgUrl())
+                .category(dto.category())
                 .build();
 
         // Adds the menu item to the specific restaurant

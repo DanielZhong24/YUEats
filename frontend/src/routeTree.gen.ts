@@ -11,11 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as VendorRouteRouteImport } from './routes/vendor/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VendorIndexRouteImport } from './routes/vendor/index'
+import { Route as VendorSettingsRouteImport } from './routes/vendor/settings'
+import { Route as VendorPrepRouteImport } from './routes/vendor/prep'
+import { Route as VendorMenuRouteImport } from './routes/vendor/menu'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as VendorSignupIndexRouteImport } from './routes/vendor/signup/index'
 import { Route as VendorLoginIndexRouteImport } from './routes/vendor/login/index'
+import { Route as VendorRestaurantsCreateIndexRouteImport } from './routes/vendor/restaurants/create/index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -26,15 +31,35 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VendorRouteRoute = VendorRouteRouteImport.update({
+  id: '/vendor',
+  path: '/vendor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VendorIndexRoute = VendorIndexRouteImport.update({
-  id: '/vendor/',
-  path: '/vendor/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => VendorRouteRoute,
+} as any)
+const VendorSettingsRoute = VendorSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => VendorRouteRoute,
+} as any)
+const VendorPrepRoute = VendorPrepRouteImport.update({
+  id: '/prep',
+  path: '/prep',
+  getParentRoute: () => VendorRouteRoute,
+} as any)
+const VendorMenuRoute = VendorMenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => VendorRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -51,66 +76,100 @@ const VendorLoginIndexRoute = VendorLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => VendorRouteRoute,
 } as any)
+const VendorRestaurantsCreateIndexRoute =
+  VendorRestaurantsCreateIndexRouteImport.update({
+    id: '/restaurants/create/',
+    path: '/restaurants/create/',
+    getParentRoute: () => VendorRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/vendor': typeof VendorRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/vendor': typeof VendorIndexRoute
+  '/vendor/menu': typeof VendorMenuRoute
+  '/vendor/prep': typeof VendorPrepRoute
+  '/vendor/settings': typeof VendorSettingsRoute
+  '/vendor/': typeof VendorIndexRoute
   '/vendor/login': typeof VendorLoginIndexRoute
   '/vendor/signup': typeof VendorSignupIndexRoute
+  '/vendor/restaurants/create': typeof VendorRestaurantsCreateIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/vendor/menu': typeof VendorMenuRoute
+  '/vendor/prep': typeof VendorPrepRoute
+  '/vendor/settings': typeof VendorSettingsRoute
   '/vendor': typeof VendorIndexRoute
   '/vendor/login': typeof VendorLoginIndexRoute
   '/vendor/signup': typeof VendorSignupIndexRoute
+  '/vendor/restaurants/create': typeof VendorRestaurantsCreateIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/vendor': typeof VendorRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/vendor/menu': typeof VendorMenuRoute
+  '/vendor/prep': typeof VendorPrepRoute
+  '/vendor/settings': typeof VendorSettingsRoute
   '/vendor/': typeof VendorIndexRoute
   '/vendor/login/': typeof VendorLoginIndexRoute
   '/vendor/signup/': typeof VendorSignupIndexRoute
+  '/vendor/restaurants/create/': typeof VendorRestaurantsCreateIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/vendor'
     | '/login'
     | '/dashboard'
-    | '/vendor'
+    | '/vendor/menu'
+    | '/vendor/prep'
+    | '/vendor/settings'
+    | '/vendor/'
     | '/vendor/login'
     | '/vendor/signup'
+    | '/vendor/restaurants/create'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/dashboard'
+    | '/vendor/menu'
+    | '/vendor/prep'
+    | '/vendor/settings'
     | '/vendor'
     | '/vendor/login'
     | '/vendor/signup'
+    | '/vendor/restaurants/create'
   id:
     | '__root__'
     | '/'
+    | '/vendor'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/dashboard'
+    | '/vendor/menu'
+    | '/vendor/prep'
+    | '/vendor/settings'
     | '/vendor/'
     | '/vendor/login/'
     | '/vendor/signup/'
+    | '/vendor/restaurants/create/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  VendorRouteRoute: typeof VendorRouteRouteWithChildren
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
-  VendorIndexRoute: typeof VendorIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -129,6 +188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vendor': {
+      id: '/vendor'
+      path: '/vendor'
+      fullPath: '/vendor'
+      preLoaderRoute: typeof VendorRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -138,10 +204,31 @@ declare module '@tanstack/react-router' {
     }
     '/vendor/': {
       id: '/vendor/'
-      path: '/vendor'
-      fullPath: '/vendor'
+      path: '/'
+      fullPath: '/vendor/'
       preLoaderRoute: typeof VendorIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof VendorRouteRoute
+    }
+    '/vendor/settings': {
+      id: '/vendor/settings'
+      path: '/settings'
+      fullPath: '/vendor/settings'
+      preLoaderRoute: typeof VendorSettingsRouteImport
+      parentRoute: typeof VendorRouteRoute
+    }
+    '/vendor/prep': {
+      id: '/vendor/prep'
+      path: '/prep'
+      fullPath: '/vendor/prep'
+      preLoaderRoute: typeof VendorPrepRouteImport
+      parentRoute: typeof VendorRouteRoute
+    }
+    '/vendor/menu': {
+      id: '/vendor/menu'
+      path: '/menu'
+      fullPath: '/vendor/menu'
+      preLoaderRoute: typeof VendorMenuRouteImport
+      parentRoute: typeof VendorRouteRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -164,8 +251,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorLoginIndexRouteImport
       parentRoute: typeof VendorRouteRoute
     }
+    '/vendor/restaurants/create/': {
+      id: '/vendor/restaurants/create/'
+      path: '/restaurants/create'
+      fullPath: '/vendor/restaurants/create'
+      preLoaderRoute: typeof VendorRestaurantsCreateIndexRouteImport
+      parentRoute: typeof VendorRouteRoute
+    }
   }
 }
+
+interface VendorRouteRouteChildren {
+  VendorMenuRoute: typeof VendorMenuRoute
+  VendorPrepRoute: typeof VendorPrepRoute
+  VendorSettingsRoute: typeof VendorSettingsRoute
+  VendorIndexRoute: typeof VendorIndexRoute
+  VendorLoginIndexRoute: typeof VendorLoginIndexRoute
+  VendorSignupIndexRoute: typeof VendorSignupIndexRoute
+  VendorRestaurantsCreateIndexRoute: typeof VendorRestaurantsCreateIndexRoute
+}
+
+const VendorRouteRouteChildren: VendorRouteRouteChildren = {
+  VendorMenuRoute: VendorMenuRoute,
+  VendorPrepRoute: VendorPrepRoute,
+  VendorSettingsRoute: VendorSettingsRoute,
+  VendorIndexRoute: VendorIndexRoute,
+  VendorLoginIndexRoute: VendorLoginIndexRoute,
+  VendorSignupIndexRoute: VendorSignupIndexRoute,
+  VendorRestaurantsCreateIndexRoute: VendorRestaurantsCreateIndexRoute,
+}
+
+const VendorRouteRouteWithChildren = VendorRouteRoute._addFileChildren(
+  VendorRouteRouteChildren,
+)
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -181,9 +299,9 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  VendorRouteRoute: VendorRouteRouteWithChildren,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
-  VendorIndexRoute: VendorIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
