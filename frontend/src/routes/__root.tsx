@@ -24,7 +24,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       <ThemeProvider defaultTheme="dark" storageKey="yueats-theme">
         <Toaster />
         <Outlet />
-        <div className="absolute bottom-0 left-0 p-3">
+        <div className="fixed bottom-0 left-0 p-3 z-50">
           <ThemeModeToggle />
         </div>
       </ThemeProvider>

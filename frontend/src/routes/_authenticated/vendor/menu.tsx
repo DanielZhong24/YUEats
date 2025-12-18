@@ -16,7 +16,7 @@ import {
 } from '@/hooks/useVendorApi'
 import { useVendorContext } from '@/context/VendorContext'
 
-export const Route = createFileRoute('/vendor/menu')({
+export const Route = createFileRoute('/_authenticated/vendor/menu')({
   component: MenuPage,
 })
 

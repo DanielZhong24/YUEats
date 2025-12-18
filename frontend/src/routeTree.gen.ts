@@ -12,14 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthsRouteImport } from './routes/auths'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as VendorRouteRouteImport } from './routes/vendor/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as VendorIndexRouteImport } from './routes/vendor/index'
-import { Route as VendorSettingsRouteImport } from './routes/vendor/settings'
-import { Route as VendorPrepRouteImport } from './routes/vendor/prep'
-import { Route as VendorMenuRouteImport } from './routes/vendor/menu'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as VendorRestaurantsCreateIndexRouteImport } from './routes/vendor/restaurants/create/index'
+import { Route as AuthenticatedVendorRouteRouteImport } from './routes/_authenticated/vendor/route'
+import { Route as AuthenticatedVendorIndexRouteImport } from './routes/_authenticated/vendor/index'
+import { Route as AuthenticatedVendorSettingsRouteImport } from './routes/_authenticated/vendor/settings'
+import { Route as AuthenticatedVendorPrepRouteImport } from './routes/_authenticated/vendor/prep'
+import { Route as AuthenticatedVendorMenuRouteImport } from './routes/_authenticated/vendor/menu'
+import { Route as AuthenticatedVendorRestaurantsCreateIndexRouteImport } from './routes/_authenticated/vendor/restaurants/create/index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -35,92 +35,95 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VendorRouteRoute = VendorRouteRouteImport.update({
-  id: '/vendor',
-  path: '/vendor',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const VendorIndexRoute = VendorIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => VendorRouteRoute,
-} as any)
-const VendorSettingsRoute = VendorSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => VendorRouteRoute,
-} as any)
-const VendorPrepRoute = VendorPrepRouteImport.update({
-  id: '/prep',
-  path: '/prep',
-  getParentRoute: () => VendorRouteRoute,
-} as any)
-const VendorMenuRoute = VendorMenuRouteImport.update({
-  id: '/menu',
-  path: '/menu',
-  getParentRoute: () => VendorRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const VendorRestaurantsCreateIndexRoute =
-  VendorRestaurantsCreateIndexRouteImport.update({
+const AuthenticatedVendorRouteRoute =
+  AuthenticatedVendorRouteRouteImport.update({
+    id: '/vendor',
+    path: '/vendor',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedVendorIndexRoute =
+  AuthenticatedVendorIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedVendorRouteRoute,
+  } as any)
+const AuthenticatedVendorSettingsRoute =
+  AuthenticatedVendorSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedVendorRouteRoute,
+  } as any)
+const AuthenticatedVendorPrepRoute = AuthenticatedVendorPrepRouteImport.update({
+  id: '/prep',
+  path: '/prep',
+  getParentRoute: () => AuthenticatedVendorRouteRoute,
+} as any)
+const AuthenticatedVendorMenuRoute = AuthenticatedVendorMenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => AuthenticatedVendorRouteRoute,
+} as any)
+const AuthenticatedVendorRestaurantsCreateIndexRoute =
+  AuthenticatedVendorRestaurantsCreateIndexRouteImport.update({
     id: '/restaurants/create/',
     path: '/restaurants/create/',
-    getParentRoute: () => VendorRouteRoute,
+    getParentRoute: () => AuthenticatedVendorRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/vendor': typeof VendorRouteRouteWithChildren
   '/auths': typeof AuthsRoute
   '/login': typeof LoginRoute
+  '/vendor': typeof AuthenticatedVendorRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/vendor/menu': typeof VendorMenuRoute
-  '/vendor/prep': typeof VendorPrepRoute
-  '/vendor/settings': typeof VendorSettingsRoute
-  '/vendor/': typeof VendorIndexRoute
-  '/vendor/restaurants/create': typeof VendorRestaurantsCreateIndexRoute
+  '/vendor/menu': typeof AuthenticatedVendorMenuRoute
+  '/vendor/prep': typeof AuthenticatedVendorPrepRoute
+  '/vendor/settings': typeof AuthenticatedVendorSettingsRoute
+  '/vendor/': typeof AuthenticatedVendorIndexRoute
+  '/vendor/restaurants/create': typeof AuthenticatedVendorRestaurantsCreateIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auths': typeof AuthsRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/vendor/menu': typeof VendorMenuRoute
-  '/vendor/prep': typeof VendorPrepRoute
-  '/vendor/settings': typeof VendorSettingsRoute
-  '/vendor': typeof VendorIndexRoute
-  '/vendor/restaurants/create': typeof VendorRestaurantsCreateIndexRoute
+  '/vendor/menu': typeof AuthenticatedVendorMenuRoute
+  '/vendor/prep': typeof AuthenticatedVendorPrepRoute
+  '/vendor/settings': typeof AuthenticatedVendorSettingsRoute
+  '/vendor': typeof AuthenticatedVendorIndexRoute
+  '/vendor/restaurants/create': typeof AuthenticatedVendorRestaurantsCreateIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/vendor': typeof VendorRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auths': typeof AuthsRoute
   '/login': typeof LoginRoute
+  '/_authenticated/vendor': typeof AuthenticatedVendorRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/vendor/menu': typeof VendorMenuRoute
-  '/vendor/prep': typeof VendorPrepRoute
-  '/vendor/settings': typeof VendorSettingsRoute
-  '/vendor/': typeof VendorIndexRoute
-  '/vendor/restaurants/create/': typeof VendorRestaurantsCreateIndexRoute
+  '/_authenticated/vendor/menu': typeof AuthenticatedVendorMenuRoute
+  '/_authenticated/vendor/prep': typeof AuthenticatedVendorPrepRoute
+  '/_authenticated/vendor/settings': typeof AuthenticatedVendorSettingsRoute
+  '/_authenticated/vendor/': typeof AuthenticatedVendorIndexRoute
+  '/_authenticated/vendor/restaurants/create/': typeof AuthenticatedVendorRestaurantsCreateIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/vendor'
     | '/auths'
     | '/login'
+    | '/vendor'
     | '/dashboard'
     | '/vendor/menu'
     | '/vendor/prep'
@@ -141,21 +144,20 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/vendor'
     | '/_authenticated'
     | '/auths'
     | '/login'
+    | '/_authenticated/vendor'
     | '/_authenticated/dashboard'
-    | '/vendor/menu'
-    | '/vendor/prep'
-    | '/vendor/settings'
-    | '/vendor/'
-    | '/vendor/restaurants/create/'
+    | '/_authenticated/vendor/menu'
+    | '/_authenticated/vendor/prep'
+    | '/_authenticated/vendor/settings'
+    | '/_authenticated/vendor/'
+    | '/_authenticated/vendor/restaurants/create/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  VendorRouteRoute: typeof VendorRouteRouteWithChildren
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthsRoute: typeof AuthsRoute
   LoginRoute: typeof LoginRoute
@@ -184,47 +186,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/vendor': {
-      id: '/vendor'
-      path: '/vendor'
-      fullPath: '/vendor'
-      preLoaderRoute: typeof VendorRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/vendor/': {
-      id: '/vendor/'
-      path: '/'
-      fullPath: '/vendor/'
-      preLoaderRoute: typeof VendorIndexRouteImport
-      parentRoute: typeof VendorRouteRoute
-    }
-    '/vendor/settings': {
-      id: '/vendor/settings'
-      path: '/settings'
-      fullPath: '/vendor/settings'
-      preLoaderRoute: typeof VendorSettingsRouteImport
-      parentRoute: typeof VendorRouteRoute
-    }
-    '/vendor/prep': {
-      id: '/vendor/prep'
-      path: '/prep'
-      fullPath: '/vendor/prep'
-      preLoaderRoute: typeof VendorPrepRouteImport
-      parentRoute: typeof VendorRouteRoute
-    }
-    '/vendor/menu': {
-      id: '/vendor/menu'
-      path: '/menu'
-      fullPath: '/vendor/menu'
-      preLoaderRoute: typeof VendorMenuRouteImport
-      parentRoute: typeof VendorRouteRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -233,41 +200,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/vendor/restaurants/create/': {
-      id: '/vendor/restaurants/create/'
+    '/_authenticated/vendor': {
+      id: '/_authenticated/vendor'
+      path: '/vendor'
+      fullPath: '/vendor'
+      preLoaderRoute: typeof AuthenticatedVendorRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/vendor/': {
+      id: '/_authenticated/vendor/'
+      path: '/'
+      fullPath: '/vendor/'
+      preLoaderRoute: typeof AuthenticatedVendorIndexRouteImport
+      parentRoute: typeof AuthenticatedVendorRouteRoute
+    }
+    '/_authenticated/vendor/settings': {
+      id: '/_authenticated/vendor/settings'
+      path: '/settings'
+      fullPath: '/vendor/settings'
+      preLoaderRoute: typeof AuthenticatedVendorSettingsRouteImport
+      parentRoute: typeof AuthenticatedVendorRouteRoute
+    }
+    '/_authenticated/vendor/prep': {
+      id: '/_authenticated/vendor/prep'
+      path: '/prep'
+      fullPath: '/vendor/prep'
+      preLoaderRoute: typeof AuthenticatedVendorPrepRouteImport
+      parentRoute: typeof AuthenticatedVendorRouteRoute
+    }
+    '/_authenticated/vendor/menu': {
+      id: '/_authenticated/vendor/menu'
+      path: '/menu'
+      fullPath: '/vendor/menu'
+      preLoaderRoute: typeof AuthenticatedVendorMenuRouteImport
+      parentRoute: typeof AuthenticatedVendorRouteRoute
+    }
+    '/_authenticated/vendor/restaurants/create/': {
+      id: '/_authenticated/vendor/restaurants/create/'
       path: '/restaurants/create'
       fullPath: '/vendor/restaurants/create'
-      preLoaderRoute: typeof VendorRestaurantsCreateIndexRouteImport
-      parentRoute: typeof VendorRouteRoute
+      preLoaderRoute: typeof AuthenticatedVendorRestaurantsCreateIndexRouteImport
+      parentRoute: typeof AuthenticatedVendorRouteRoute
     }
   }
 }
 
-interface VendorRouteRouteChildren {
-  VendorMenuRoute: typeof VendorMenuRoute
-  VendorPrepRoute: typeof VendorPrepRoute
-  VendorSettingsRoute: typeof VendorSettingsRoute
-  VendorIndexRoute: typeof VendorIndexRoute
-  VendorRestaurantsCreateIndexRoute: typeof VendorRestaurantsCreateIndexRoute
+interface AuthenticatedVendorRouteRouteChildren {
+  AuthenticatedVendorMenuRoute: typeof AuthenticatedVendorMenuRoute
+  AuthenticatedVendorPrepRoute: typeof AuthenticatedVendorPrepRoute
+  AuthenticatedVendorSettingsRoute: typeof AuthenticatedVendorSettingsRoute
+  AuthenticatedVendorIndexRoute: typeof AuthenticatedVendorIndexRoute
+  AuthenticatedVendorRestaurantsCreateIndexRoute: typeof AuthenticatedVendorRestaurantsCreateIndexRoute
 }
 
-const VendorRouteRouteChildren: VendorRouteRouteChildren = {
-  VendorMenuRoute: VendorMenuRoute,
-  VendorPrepRoute: VendorPrepRoute,
-  VendorSettingsRoute: VendorSettingsRoute,
-  VendorIndexRoute: VendorIndexRoute,
-  VendorRestaurantsCreateIndexRoute: VendorRestaurantsCreateIndexRoute,
-}
+const AuthenticatedVendorRouteRouteChildren: AuthenticatedVendorRouteRouteChildren =
+  {
+    AuthenticatedVendorMenuRoute: AuthenticatedVendorMenuRoute,
+    AuthenticatedVendorPrepRoute: AuthenticatedVendorPrepRoute,
+    AuthenticatedVendorSettingsRoute: AuthenticatedVendorSettingsRoute,
+    AuthenticatedVendorIndexRoute: AuthenticatedVendorIndexRoute,
+    AuthenticatedVendorRestaurantsCreateIndexRoute:
+      AuthenticatedVendorRestaurantsCreateIndexRoute,
+  }
 
-const VendorRouteRouteWithChildren = VendorRouteRoute._addFileChildren(
-  VendorRouteRouteChildren,
-)
+const AuthenticatedVendorRouteRouteWithChildren =
+  AuthenticatedVendorRouteRoute._addFileChildren(
+    AuthenticatedVendorRouteRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedVendorRouteRoute: typeof AuthenticatedVendorRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedVendorRouteRoute: AuthenticatedVendorRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
 }
 
@@ -277,7 +284,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  VendorRouteRoute: VendorRouteRouteWithChildren,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthsRoute: AuthsRoute,
   LoginRoute: LoginRoute,
