@@ -1,29 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import Hero from '@/components/ui/hero'
-import { useTheme } from '@/components/theme-provider'
-import { useEffect, useRef } from 'react'
 
 export const Route = createFileRoute('/')({
   component: App,
 })
 
 function App() {
-  const { theme, setTheme } = useTheme()
-  const previousTheme = useRef(theme)
-
-  useEffect(() => {
-    // Save current theme
-    previousTheme.current = theme
-
-    // Force dark theme for landing page
-    setTheme('light')
-
-    // Restore theme when leaving route
-    return () => {
-      setTheme(previousTheme.current)
-    }
-  }, [])
   return (
     <div className="bg-background text-foreground">
       {/* HERO SECTION */}
@@ -47,25 +30,18 @@ function App() {
                 alt="YuEats logo"
                 className="w-10 h-10 object-cover rounded"
               />
-              <span className="font-semibold text-lg text-white">
-                YuEats
-              </span>
+              <span className="font-semibold text-lg text-white">YuEats</span>
             </div>
 
             <div className="flex items-center space-x-2">
               <Link to="/login">
-                <Button
-                  variant="secondary"
-                  className="rounded-full"
-                >
+                <Button variant="secondary" className="rounded-full">
                   Login
                 </Button>
               </Link>
 
               <Link to="/signup">
-                <Button className="rounded-full">
-                  Sign up
-                </Button>
+                <Button className="rounded-full">Sign up</Button>
               </Link>
             </div>
           </div>
@@ -113,14 +89,9 @@ function App() {
                 />
               </div>
 
-              <h3 className="text-3xl font-bold mb-2">
-                Add your restaurant
-              </h3>
+              <h3 className="text-3xl font-bold mb-2">Add your restaurant</h3>
 
-              <Link
-                to="/vendor/add"
-                className="text-sm text-primary underline"
-              >
+              <Link to="/vendor/add" className="text-sm text-primary underline">
                 Add restaurant
               </Link>
             </div>
@@ -135,9 +106,7 @@ function App() {
                 />
               </div>
 
-              <h3 className="text-3xl font-bold mb-2">
-                Sign up to deliver
-              </h3>
+              <h3 className="text-3xl font-bold mb-2">Sign up to deliver</h3>
 
               <Link
                 to="/courier/signup"

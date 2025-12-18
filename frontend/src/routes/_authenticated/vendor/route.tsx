@@ -2,8 +2,17 @@ import { createFileRoute, Outlet } from '@tanstack/react-router'
 import Sidebar from '@/components/vendor/Sidebar'
 import Topbar from '@/components/vendor/Topbar'
 import { VendorProvider } from '@/context/VendorContext' // 👈 Import this
+import { redirect } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/vendor')({
+export const Route = createFileRoute('/_authenticated/vendor')({
+  beforeLoad: ({ context }) => {
+    if (!context.auth.isAuthenticated) {
+      throw redirect({
+        to: '/auths',
+        search: { redirect: window.location.pathname },
+      })
+    }
+  },
   component: VendorLayout,
 })
 

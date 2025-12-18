@@ -3,8 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
-import { AuthProvider, useAuth } from './auth'
-import { ThemeProvider } from '@/components/theme-provider'
+import { AuthProvider, useAuth } from './auth/provider.tsx'
 import { router } from './router'
 
 import './styles.css'
@@ -25,11 +24,9 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <AuthProvider>
-        <ThemeProvider defaultTheme="system">
-          <TanStackQueryProvider.Provider {...TanStackQueryProvider.getContext()}>
-            <InnerApp />
-          </TanStackQueryProvider.Provider>
-        </ThemeProvider>
+        <TanStackQueryProvider.Provider {...TanStackQueryProvider.getContext()}>
+          <InnerApp />
+        </TanStackQueryProvider.Provider>
       </AuthProvider>
     </StrictMode>,
   )

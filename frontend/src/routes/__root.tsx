@@ -11,12 +11,7 @@ import { ThemeModeToggle } from '@/components/theme-mode-toggle'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
-interface AuthState {
-  isAuthenticated: boolean
-  user: { id: string; username: string; email: string } | null
-  login: (username: string, password: string) => Promise<void>
-  logout: () => void
-}
+import { AuthState } from '../auth/provider'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -29,7 +24,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       <ThemeProvider defaultTheme="dark" storageKey="yueats-theme">
         <Toaster />
         <Outlet />
-        <div className="absolute bottom-0 left-0 p-3">
+        <div className="fixed bottom-0 left-0 p-3 z-50">
           <ThemeModeToggle />
         </div>
       </ThemeProvider>
