@@ -11,4 +11,5 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     // Check to see if a restaurant exists by name
     boolean existsByRestaurantName(String name);
+
 }
