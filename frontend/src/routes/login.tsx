@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useState } from 'react'
+import { useLoginMutation } from '@/auth/provider'
 
 export const Route = createFileRoute('/login')({
   validateSearch: (search) => ({
@@ -11,31 +12,26 @@ export const Route = createFileRoute('/login')({
       throw redirect({ to: search.redirect as any })
     }
   },
-  component: LoginComponent,
+  component: AuthComponent,
 })
 
-function LoginComponent() {
-  const { auth } = Route.useRouteContext()
+function AuthComponent() {
   const { redirect: redirectPath } = Route.useSearch()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const loginMutation = useLoginMutation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    setError('')
 
-    try {
-      await auth.login(username, password)
-      // Use window.location to handle the redirect after successful login
-      window.location.href = redirectPath
-    } catch (err) {
-      setError('Invalid username or password')
-    } finally {
-      setIsLoading(false)
-    }
+    loginMutation.mutate(
+      { username, password },
+      {
+        onSuccess: () => {
+          window.location.href = redirectPath
+        },
+      },
+    )
   }
 
   return (
@@ -46,9 +42,9 @@ function LoginComponent() {
       >
         <h1 className="text-2xl font-bold text-center">Sign In</h1>
 
-        {error && (
+        {loginMutation.isError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
+            {loginMutation.error?.message || 'Invalid username or password'}
           </div>
         )}
 
@@ -82,10 +78,10 @@ function LoginComponent() {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={loginMutation.isPending}
           className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Signing in...' : 'Sign In'}
+          {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
     </div>

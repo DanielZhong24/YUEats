@@ -23,12 +23,12 @@ export interface Vendor extends User {
   ownedRestaurants?: Restaurant[]
 }
 
-export interface DeliveryDriver extends User {
+export interface Driver extends User {
   userRole: 'DRIVER'
 }
 
 // Discriminated Union of All User Types
-export type AppUser = Customer | Vendor | DeliveryDriver
+export type AppUser = Customer | Vendor | Driver
 
 // Restaurant Interface
 export interface Restaurant {

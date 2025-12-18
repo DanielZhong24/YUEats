@@ -1,7 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import { toast } from 'sonner'
 import * as z from 'zod'
-import { useSignup } from '@/hooks/useSignup'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -83,22 +81,24 @@ const formSchema = z
     path: ['passwordConfirm'],
   })
 
-export function VendorSignupForm() {
-  const { mutate: signup, isPending } = useSignup({
-    userType: 'vendors',
-    onSuccess: () => {
-      toast.success('Account Created Successfully!', {
-        description: 'You can now log in to your vendor account.',
-      })
-      form.reset()
-    },
-    onError: (error) => {
-      toast.error('Signup failed!', {
-        description: error.message || 'Could not connect to the server',
-      })
-    },
-  })
+interface AuthFormProps {
+  onSubmit: (data: {
+    firstName: string
+    lastName: string
+    businessName: string
+    email: string
+    phoneNumber: string
+    password: string
+  }) => void
+  isPending?: boolean
+  onSuccess?: () => void
+}
 
+export function AuthForm({
+  onSubmit,
+  isPending = false,
+  onSuccess,
+}: AuthFormProps) {
   const form = useForm({
     defaultValues: {
       firstName: '',
@@ -116,7 +116,11 @@ export function VendorSignupForm() {
       const { passwordConfirm, ...sanitized } = value
       sanitized.phoneNumber = sanitized.phoneNumber?.replace(/[-\s]/g, '')
 
-      signup(sanitized)
+      onSubmit(sanitized)
+
+      if (onSuccess) {
+        onSuccess()
+      }
     },
   })
 
@@ -125,14 +129,14 @@ export function VendorSignupForm() {
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Create a Vendor Account</CardTitle>
+        <CardTitle className="text-xl">Create your account</CardTitle>
         <CardDescription>
-          Fill out the form below to sign up as a vendor.
+          Enter your email below to create your account
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form
-          id="vendor-signup-form"
+          id="auth-form"
           onSubmit={(e) => {
             e.preventDefault()
             form.handleSubmit()
@@ -235,7 +239,7 @@ export function VendorSignupForm() {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        placeholder="vendor@domain.com"
+                        placeholder="first_last@domain.com"
                         autoComplete="off"
                         type="email"
                       />
@@ -341,21 +345,22 @@ export function VendorSignupForm() {
             <Field orientation="horizontal">
               <Button
                 type="submit"
-                form="vendor-signup-form"
+                form="auth-form"
                 className="w-full"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Creating...' : 'Create Vendor Account'}{' '}
+                {isSubmitting ? 'Creating...' : 'Creating Account'}{' '}
               </Button>
             </Field>
             <FieldDescription className="text-center ">
               Already have an account?
               <Link
-                to="/vendor/login"
+                to="/login"
+                search={{ redirect: '/' }}
                 preload="render"
                 className="ml-1 font-medium underline"
               >
-                Login Here
+                CHANGE
               </Link>
             </FieldDescription>
           </FieldGroup>

@@ -10,16 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthsRouteImport } from './routes/auths'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VendorIndexRouteImport } from './routes/vendor/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as VendorSignupIndexRouteImport } from './routes/vendor/signup/index'
-import { Route as VendorLoginIndexRouteImport } from './routes/vendor/login/index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthsRoute = AuthsRouteImport.update({
+  id: '/auths',
+  path: '/auths',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -41,78 +45,51 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const VendorSignupIndexRoute = VendorSignupIndexRouteImport.update({
-  id: '/vendor/signup/',
-  path: '/vendor/signup/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VendorLoginIndexRoute = VendorLoginIndexRouteImport.update({
-  id: '/vendor/login/',
-  path: '/vendor/login/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auths': typeof AuthsRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/vendor': typeof VendorIndexRoute
-  '/vendor/login': typeof VendorLoginIndexRoute
-  '/vendor/signup': typeof VendorSignupIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auths': typeof AuthsRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/vendor': typeof VendorIndexRoute
-  '/vendor/login': typeof VendorLoginIndexRoute
-  '/vendor/signup': typeof VendorSignupIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/auths': typeof AuthsRoute
   '/login': typeof LoginRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/vendor/': typeof VendorIndexRoute
-  '/vendor/login/': typeof VendorLoginIndexRoute
-  '/vendor/signup/': typeof VendorSignupIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/login'
-    | '/dashboard'
-    | '/vendor'
-    | '/vendor/login'
-    | '/vendor/signup'
+  fullPaths: '/' | '/auths' | '/login' | '/dashboard' | '/vendor'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/login'
-    | '/dashboard'
-    | '/vendor'
-    | '/vendor/login'
-    | '/vendor/signup'
+  to: '/' | '/auths' | '/login' | '/dashboard' | '/vendor'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/auths'
     | '/login'
     | '/_authenticated/dashboard'
     | '/vendor/'
-    | '/vendor/login/'
-    | '/vendor/signup/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthsRoute: typeof AuthsRoute
   LoginRoute: typeof LoginRoute
   VendorIndexRoute: typeof VendorIndexRoute
-  VendorLoginIndexRoute: typeof VendorLoginIndexRoute
-  VendorSignupIndexRoute: typeof VendorSignupIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -122,6 +99,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auths': {
+      id: '/auths'
+      path: '/auths'
+      fullPath: '/auths'
+      preLoaderRoute: typeof AuthsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -152,20 +136,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/vendor/signup/': {
-      id: '/vendor/signup/'
-      path: '/vendor/signup'
-      fullPath: '/vendor/signup'
-      preLoaderRoute: typeof VendorSignupIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/vendor/login/': {
-      id: '/vendor/login/'
-      path: '/vendor/login'
-      fullPath: '/vendor/login'
-      preLoaderRoute: typeof VendorLoginIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -184,10 +154,9 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthsRoute: AuthsRoute,
   LoginRoute: LoginRoute,
   VendorIndexRoute: VendorIndexRoute,
-  VendorLoginIndexRoute: VendorLoginIndexRoute,
-  VendorSignupIndexRoute: VendorSignupIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
