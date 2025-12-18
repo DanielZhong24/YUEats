@@ -44,14 +44,14 @@ public class VendorController {
 
     @GetMapping("/me/restaurants")
     public ResponseEntity<List<Restaurant>> getMyRestaurants(@AuthenticationPrincipal UserDetails userDetails) {
-        // if (userDetails == null) {
-        // return ResponseEntity.status(401).build();
-        // }
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
 
-        // User user = userRepository.findByEmail(userDetails.getUsername())
-        // .orElseThrow(() -> new RuntimeException("User not found"));
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Test User 1 not found"));
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // User user = userRepository.findById(1L)
+        // .orElseThrow(() -> new RuntimeException("Test User 1 not found"));
         if (!(user instanceof Vendor vendor)) {
             // Not a vendor — return empty list or 403 depending on desired behavior
             return ResponseEntity.status(403).body(Collections.emptyList());
