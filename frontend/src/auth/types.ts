@@ -1,5 +1,5 @@
 // User Role Types
-export type UserRole = 'CUSTOMER' | 'VENDOR' | 'DRIVER'
+export type UserRole = 'CUSTOMER' | 'VENDOR' | 'COURIER'
 
 // Base User Interface
 export interface User {
@@ -23,12 +23,12 @@ export interface Vendor extends User {
   ownedRestaurants?: Restaurant[]
 }
 
-export interface Driver extends User {
-  userRole: 'DRIVER'
+export interface Courier extends User {
+  userRole: 'COURIER'
 }
 
 // Discriminated Union of All User Types
-export type AppUser = Customer | Vendor | Driver
+export type AppUser = Customer | Vendor | Courier
 
 // Restaurant Interface
 export interface Restaurant {
@@ -54,6 +54,19 @@ export interface SignupPayload {
 
 export interface VendorSignupPayload extends SignupPayload {
   businessName: string
+}
+
+export interface CourierSignupPayload extends SignupPayload {}
+
+// Consolidated signup data type that can handle all user types
+export interface SignupData {
+  firstName: string
+  lastName: string
+  businessName?: string
+  email: string
+  phoneNumber: string
+  password: string
+  userRole?: UserRole
 }
 
 // Signup Response Interface

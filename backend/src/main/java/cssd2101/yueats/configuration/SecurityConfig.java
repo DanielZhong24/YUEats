@@ -45,21 +45,24 @@ public class SecurityConfig {
                         "/h2-console/**",
                         "/login",
                         "/logout",
+                        "/customers",
+                        "/vendors",
+                        "/drivers",
                         "/orders/**",
                         "/restaurants/**",
-                        "/vendors/**",
                         "/users/**"))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(auth -> auth
-                        // Publicly accessible paths
-                        .requestMatchers("/customers", "/vendors/**", "/users", "/h2-console/**", "/login",
-                                "/restaurants/**", "/orders/**")
+                        // Publicly accessible paths - signup endpoints must come first
+                        .requestMatchers("/customers", "/vendors", "/drivers", "/h2-console/**", "/login")
                         .permitAll()
 
-                        // Specific Role protections
+                        // Public restaurant browsing
+                        .requestMatchers("/restaurants/**").permitAll()
+
+                        // Specific Role protections - must come after public paths
                         .requestMatchers("/orders/**").authenticated()
                         .requestMatchers("/vendors/**").hasRole("VENDOR")
-                        .requestMatchers("/restaurants/**").hasRole("VENDOR")
 
                         // Catch-all for everything else
                         .anyRequest().authenticated())

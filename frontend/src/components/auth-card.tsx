@@ -5,21 +5,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SignupForm } from './forms/signup-form'
 import { LoginForm } from './forms/login-form'
+import type { SignupData, LoginPayload } from '@/auth/types'
 
 interface AuthCardProps {
-  onSignup: (data: {
-    firstName: string
-    lastName: string
-    businessName: string
-    email: string
-    phoneNumber: string
-    password: string
-  }) => void
-  onLogin: (data: { email: string; password: string }) => void
+  onSignup: (data: SignupData) => void
+  onLogin: (data: LoginPayload) => void
   isPending?: boolean
   onSuccess?: () => void
 }
@@ -37,36 +30,6 @@ export function AuthCard({
         <CardDescription>
           Create an account to get started with YUEats!
         </CardDescription>
-        <div className="flex justify-center mt-2">
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            defaultValue="customer"
-            size="sm"
-          >
-            <ToggleGroupItem
-              value="customer"
-              aria-label="Toggle Customer"
-              className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-yellow-500 data-[state=on]:*:[svg]:stroke-yellow-500"
-            >
-              Customer
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="vendor"
-              aria-label="Toggle Vendor"
-              className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
-            >
-              Vendor
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="driver"
-              aria-label="Toggle Driver"
-              className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-blue-500 data-[state=on]:*:[svg]:stroke-blue-500"
-            >
-              Driver
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </div>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="signup">

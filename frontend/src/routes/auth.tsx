@@ -1,10 +1,16 @@
 import { useLoginMutation, useSignupMutation } from '@/auth/provider'
-import type { LoginPayload, VendorSignupPayload } from '@/auth/types'
+import type {
+  LoginPayload,
+  SignupPayload,
+  VendorSignupPayload,
+  CourierSignupPayload,
+  SignupData,
+} from '@/auth/types'
 import { AuthCard } from '@/components/auth-card'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute('/auths')({
+export const Route = createFileRoute('/auth')({
   validateSearch: (search) => ({
     redirect: (search.redirect as string) || '/',
   }),
@@ -22,15 +28,38 @@ function AuthPage() {
   const signupMutation = useSignupMutation()
   const loginMutation = useLoginMutation()
 
-  const handleSignup = async (data: VendorSignupPayload) => {
+  const handleSignup = async (data: SignupData) => {
+    // Determine the user type endpoint based on userRole
+    const userRole = data.userRole || 'CUSTOMER'
+    let userType: 'vendors' | 'customers' | 'drivers'
+
+    if (userRole === 'VENDOR') {
+      userType = 'vendors'
+    } else if (userRole === 'COURIER') {
+      userType = 'drivers'
+    } else {
+      userType = 'customers'
+    }
+
+    const { userRole: _, ...payloadData } = data
+    const payload: SignupPayload | VendorSignupPayload | CourierSignupPayload =
+      userRole === 'VENDOR'
+        ? (payloadData as VendorSignupPayload)
+        : (payloadData as SignupPayload)
+
     signupMutation.mutate(
-      { userType: 'vendors', payload: data },
+      { userType, payload },
       {
         onSuccess: () => {
           toast.success('Account Created Successfully!', {
             description: 'Welcome to YUEats!',
           })
-          router.navigate({ to: '/dashboard' })
+          // Navigate based on user type
+          if (userRole === 'VENDOR') {
+            router.navigate({ to: '/dashboard' })
+          } else {
+            router.navigate({ to: '/' })
+          }
         },
         onError: (error) => {
           toast.error('Signup failed!', {
@@ -43,11 +72,16 @@ function AuthPage() {
 
   const handleLogin = async (data: LoginPayload) => {
     loginMutation.mutate(data, {
-      onSuccess: () => {
+      onSuccess: (userData) => {
         toast.success('Login Successful!', {
           description: 'Welcome back to YUEats!',
         })
-        router.navigate({ to: '/dashboard' })
+        // Navigate based on user role
+        if (userData.userRole === 'VENDOR') {
+          router.navigate({ to: '/dashboard' })
+        } else {
+          router.navigate({ to: '/' })
+        }
       },
       onError: (error) => {
         toast.error('Login failed!', {

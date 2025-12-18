@@ -5,6 +5,7 @@ import type {
   AppUser,
   SignupPayload,
   VendorSignupPayload,
+  CourierSignupPayload,
   SignupResponse,
   LoginPayload,
 } from './types'
@@ -17,8 +18,8 @@ const checkBackendUrl = () => {
 
 // Core API functions
 const signupApi = async (
-  userType: 'vendors' | 'customers',
-  payload: SignupPayload | VendorSignupPayload,
+  userType: 'customers' | 'vendors' | 'drivers',
+  payload: SignupPayload | VendorSignupPayload | CourierSignupPayload,
 ): Promise<SignupResponse> => {
   checkBackendUrl()
   const response = await fetch(
@@ -93,8 +94,8 @@ export function useSignupMutation() {
       userType,
       payload,
     }: {
-      userType: 'vendors' | 'customers'
-      payload: SignupPayload | VendorSignupPayload
+      userType: 'customers' | 'vendors' | 'drivers'
+      payload: SignupPayload | VendorSignupPayload | CourierSignupPayload
     }) => signupApi(userType, payload),
     onSuccess: async (_data, variables) => {
       // Auto-login after successful signup
@@ -140,7 +141,7 @@ export function useLogoutMutation() {
       setIsAuthenticated(false)
       queryClient.clear()
 
-      router.navigate({ to: '/auths', search: { redirect: '/' } })
+      router.navigate({ to: '/auth', search: { redirect: '/' } })
     },
   })
 }

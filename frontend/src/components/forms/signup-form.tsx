@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react'
 import { useForm } from '@tanstack/react-form'
 
 import { Button } from '@/components/ui/button'
@@ -9,12 +10,13 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
-import { signupSchema } from '@/schemas/signup-login'
-import type { VendorSignupPayload } from '@/auth/types'
+import { customerCourierSchema, vendorSchema } from '@/schemas/signup-login'
+import type { SignupData, UserRole } from '@/auth/types'
 
 interface SignupFormProps {
-  onSubmit: (data: VendorSignupPayload) => void
+  onSubmit: (data: SignupData) => void
   isPending?: boolean
   onSuccess?: () => void
 }
@@ -24,24 +26,37 @@ export function SignupForm({
   isPending = false,
   onSuccess,
 }: SignupFormProps) {
+  const [selectedRole, setSelectedRole] = useState<UserRole>('CUSTOMER')
+
+  // Dynamically select schema based on user role
+  const validationSchema = useMemo(() => {
+    return selectedRole === 'VENDOR' ? vendorSchema : customerCourierSchema
+  }, [selectedRole])
+
   const form = useForm({
     defaultValues: {
       firstName: '',
       lastName: '',
-      businessName: '',
+      businessName: '' as string | undefined,
       email: '',
       phoneNumber: '',
       password: '',
       passwordConfirm: '',
     },
     validators: {
-      onSubmit: signupSchema,
+      onSubmit: validationSchema as any,
     },
     onSubmit: async ({ value }) => {
       const { passwordConfirm, ...sanitized } = value
       sanitized.phoneNumber = sanitized.phoneNumber?.replace(/[-\s]/g, '')
 
-      onSubmit(sanitized)
+      // Remove businessName if not a vendor
+      if (selectedRole !== 'VENDOR') {
+        const { businessName, ...withoutBusinessName } = sanitized
+        onSubmit({ ...withoutBusinessName, userRole: selectedRole })
+      } else {
+        onSubmit({ ...sanitized, userRole: selectedRole })
+      }
 
       if (onSuccess) {
         onSuccess()
@@ -53,6 +68,39 @@ export function SignupForm({
 
   return (
     <Card className="w-full sm:max-w-md p-5">
+      <div className="flex justify-center mb-4">
+        <ToggleGroup
+          type="single"
+          variant="outline"
+          value={selectedRole}
+          onValueChange={(value) => {
+            if (value) setSelectedRole(value as UserRole)
+          }}
+          size="sm"
+        >
+          <ToggleGroupItem
+            value="CUSTOMER"
+            aria-label="Toggle Customer"
+            className="transition-all data-[state=on]:bg-red-500/10 data-[state=on]:text-red-600 data-[state=on]:font-semibold data-[state=off]:opacity-50"
+          >
+            Customer
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="VENDOR"
+            aria-label="Toggle Vendor"
+            className="transition-all data-[state=on]:bg-red-500/10 data-[state=on]:text-red-600 data-[state=on]:font-semibold data-[state=off]:opacity-50"
+          >
+            Vendor
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="COURIER"
+            aria-label="Toggle Courier"
+            className="transition-all data-[state=on]:bg-red-500/10 data-[state=on]:text-red-600 data-[state=on]:font-semibold data-[state=off]:opacity-50"
+          >
+            Courier
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
       <form
         id="signup-form"
         onSubmit={(e) => {
@@ -115,30 +163,34 @@ export function SignupForm({
               }}
             />
           </div>
-          <form.Field
-            name="businessName"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Business Name</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="YUEats"
-                    autoComplete="off"
-                    type="text"
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              )
-            }}
-          />
+          {selectedRole === 'VENDOR' && (
+            <form.Field
+              name="businessName"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Business Name</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="YUEats"
+                      autoComplete="off"
+                      type="text"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
+          )}
           <div className="flex flex-row gap-4">
             <form.Field
               name="email"

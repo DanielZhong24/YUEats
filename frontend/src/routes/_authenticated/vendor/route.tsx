@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_authenticated/vendor')({
   beforeLoad: ({ context }) => {
     if (!context.auth.isAuthenticated) {
       throw redirect({
-        to: '/auths',
+        to: '/auth',
         search: { redirect: window.location.pathname },
       })
     }
