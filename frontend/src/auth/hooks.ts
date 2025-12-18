@@ -141,7 +141,7 @@ export function useLogoutMutation() {
       setIsAuthenticated(false)
       queryClient.clear()
 
-      router.navigate({ to: '/auth', search: { redirect: '/' } })
+      router.navigate({ to: '/auth', search: { redirect: '/', mode: 'login' } })
     },
   })
 }

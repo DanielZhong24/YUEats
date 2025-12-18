@@ -1,18 +1,5 @@
 import { createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
-import type { QueryClient } from '@tanstack/react-query'
-
-interface AuthState {
-  isAuthenticated: boolean
-  user: { id: string; username: string; email: string } | null
-  login: (username: string, password: string) => Promise<void>
-  logout: () => void
-}
-
-interface MyRouterContext {
-  queryClient: QueryClient
-  auth: AuthState
-}
 
 export const router = createRouter({
   routeTree,
