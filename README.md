@@ -72,38 +72,257 @@ A full-stack food delivery platform built with Spring Boot and React, featuring 
 
 ## 📁 Project Structure
 
+<details>
+<summary><strong>Click to expand full project structure</strong></summary>
+
 ```
 YUEats/
-├── backend/                # Spring Boot backend
+├── LICENSE
+├── README.md
+│
+├── backend/                                    # Spring Boot Backend Application
+│   ├── mvnw                                   # Maven wrapper script (Unix)
+│   ├── mvnw.cmd                              # Maven wrapper script (Windows)
+│   ├── pom.xml                               # Maven project configuration
+│   │
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/
-│   │   │   │   └── cssd2101/     # Java source code
+│   │   │   │   └── cssd2101/
+│   │   │   │       └── yueats/
+│   │   │   │           ├── YuEatsApplication.java           # Main Spring Boot application class
+│   │   │   │           │
+│   │   │   │           ├── builder/                         # Builder pattern implementations
+│   │   │   │           │
+│   │   │   │           ├── configuration/                   # Spring configuration classes
+│   │   │   │           │   └── SecurityConfig.java          # Security configuration
+│   │   │   │           │
+│   │   │   │           ├── controller/                      # REST API Controllers
+│   │   │   │           │   ├── CourierController.java       # Courier endpoints
+│   │   │   │           │   ├── CustomerController.java      # Customer endpoints
+│   │   │   │           │   ├── OrderController.java         # Order management endpoints
+│   │   │   │           │   ├── RestaurantController.java    # Restaurant endpoints
+│   │   │   │           │   ├── UserController.java          # User authentication endpoints
+│   │   │   │           │   └── VendorController.java        # Vendor endpoints
+│   │   │   │           │
+│   │   │   │           ├── dto/                             # Data Transfer Objects
+│   │   │   │           │   ├── CustomerSignupRequest.java
+│   │   │   │           │   ├── MenuItemCreationRequest.java
+│   │   │   │           │   ├── OrderCreationRequest.java
+│   │   │   │           │   ├── OrderItemRequest.java
+│   │   │   │           │   ├── PickupCodeRequest.java
+│   │   │   │           │   ├── RestaurantCreationRequest.java
+│   │   │   │           │   └── VendorSignupRequest.java
+│   │   │   │           │
+│   │   │   │           ├── exceptions/                      # Custom exception classes
+│   │   │   │           │
+│   │   │   │           ├── factory/                         # Factory pattern implementations
+│   │   │   │           │   └── UserFactory.java
+│   │   │   │           │
+│   │   │   │           ├── model/                           # JPA Entity Models
+│   │   │   │           │   ├── Admin.java
+│   │   │   │           │   ├── Customer.java
+│   │   │   │           │   ├── DeliveryCourier.java
+│   │   │   │           │   ├── MenuItem.java
+│   │   │   │           │   ├── Order.java
+│   │   │   │           │   ├── OrderDetail.java
+│   │   │   │           │   ├── Restaurant.java
+│   │   │   │           │   ├── User.java
+│   │   │   │           │   └── Vendor.java
+│   │   │   │           │
+│   │   │   │           ├── repository/                      # Spring Data JPA Repositories
+│   │   │   │           │   ├── MenuItemRepository.java
+│   │   │   │           │   ├── OrderRepository.java
+│   │   │   │           │   ├── RestaurantRepository.java
+│   │   │   │           │   └── UserRepository.java
+│   │   │   │           │
+│   │   │   │           ├── scheduler/                       # Order state machine & scheduling
+│   │   │   │           │   ├── OrderEventListener.java
+│   │   │   │           │   ├── OrderStateMachine.java
+│   │   │   │           │   ├── OrderStatusEvent.java
+│   │   │   │           │   ├── OrderStatusScheduler.java
+│   │   │   │           │   └── SchedulerConfig.java
+│   │   │   │           │
+│   │   │   │           ├── service/                         # Business Logic Layer
+│   │   │   │           │   ├── CustomerDetailsService.java
+│   │   │   │           │   ├── MenuItemService.java
+│   │   │   │           │   ├── OrderService.java
+│   │   │   │           │   ├── RestaurantService.java
+│   │   │   │           │   └── UserService.java
+│   │   │   │           │
+│   │   │   │           ├── types/                           # Enums and Type definitions
+│   │   │   │           │   ├── OrderStatus.java
+│   │   │   │           │   └── UserRole.java
+│   │   │   │           │
+│   │   │   │           └── validation/                      # Custom validation logic
+│   │   │   │
 │   │   │   └── resources/
-│   │   │       ├── application.properties
-│   │   │       ├── schema.sql
-│   │   │       └── data.sql
+│   │   │       ├── application.properties                   # Application configuration
+│   │   │       ├── schema.sql                               # Database schema definition
+│   │   │       └── data.sql                                 # Sample data for initialization
+│   │   │
 │   │   └── test/
-│   ├── pom.xml
-│   └── mvnw
+│   │       └── java/
+│   │           └── cssd2101/
+│   │               └── yueats/                              # Test classes
+│   │
+│   └── target/                                              # Compiled classes (generated)
+│       ├── classes/
+│       ├── generated-sources/
+│       ├── generated-test-sources/
+│       ├── maven-status/
+│       └── test-classes/
 │
-└── frontend/               # React frontend
-    ├── src/
-    │   ├── components/     # Reusable UI components
-    │   │   ├── customer/   # Customer-specific components
-    │   │   ├── vendor/     # Vendor-specific components
-    │   │   ├── courier/    # Courier-specific components
-    │   │   ├── forms/      # Form components
-    │   │   └── ui/         # Base UI components
-    │   ├── routes/         # Application routes
-    │   ├── services/       # API service layer
-    │   ├── hooks/          # Custom React hooks
-    │   ├── store/          # State management
-    │   ├── auth/           # Authentication logic
-    │   └── schemas/        # Validation schemas
-    ├── package.json
-    └── vite.config.ts
+└── frontend/                                   # React Frontend Application
+    ├── index.html                             # Main HTML entry point
+    ├── package.json                           # NPM dependencies and scripts
+    ├── pnpm-lock.yaml                         # Lockfile for dependencies
+    ├── tsconfig.json                          # TypeScript configuration
+    ├── vite.config.ts                         # Vite build configuration
+    ├── components.json                        # UI components configuration
+    ├── eslint.config.js                       # ESLint configuration
+    ├── prettier.config.js                     # Prettier configuration
+    ├── README.md                              # Frontend documentation
+    │
+    ├── public/                                # Static assets
+    │   ├── favicon.ico
+    │   ├── logo.png
+    │   ├── hero-1.jpg
+    │   ├── manifest.json
+    │   ├── robots.txt
+    │   ├── tanstack-circle-logo.png
+    │   ├── tanstack-word-logo-white.svg
+    │   └── assets/
+    │       └── home/                          # Homepage assets
+    │
+    └── src/
+        ├── App.tsx                            # Root application component
+        ├── main.tsx                           # Application entry point
+        ├── router.tsx                         # Router configuration
+        ├── routeTree.gen.ts                   # Generated route tree (TanStack Router)
+        ├── reportWebVitals.ts                 # Performance monitoring
+        ├── styles.css                         # Global styles
+        ├── logo.svg
+        │
+        ├── auth/                              # Authentication Module
+        │   ├── hooks.ts                       # Auth-related hooks
+        │   ├── provider.tsx                   # Auth context provider
+        │   └── types.ts                       # Auth type definitions
+        │
+        ├── components/                        # React Components
+        │   ├── auth-card.tsx                  # Authentication card wrapper
+        │   ├── theme-mode-toggle.tsx          # Dark/Light mode toggle
+        │   ├── theme-provider.tsx             # Theme context provider
+        │   │
+        │   ├── courier/                       # Courier Role Components
+        │   │   ├── CourierDashboard.tsx
+        │   │   ├── CourierLayout.tsx
+        │   │   └── CourierTopbar.tsx
+        │   │
+        │   ├── customer/                      # Customer Role Components
+        │   │   ├── CheckoutPage.tsx
+        │   │   ├── CustomerDashboard.tsx
+        │   │   ├── CustomerLayout.tsx
+        │   │   ├── CustomerTopbar.tsx
+        │   │   ├── LiveOrderStatus.tsx
+        │   │   ├── OrdersPage.tsx
+        │   │   └── RestaurantDetail.tsx
+        │   │
+        │   ├── forms/                         # Form Components
+        │   │   ├── login-form.tsx
+        │   │   └── signup-form.tsx
+        │   │
+        │   ├── ui/                            # Reusable UI Components (shadcn/ui)
+        │   │   ├── button.tsx
+        │   │   ├── card.tsx
+        │   │   ├── ConfirmDeleteModal.tsx
+        │   │   ├── dropdown-menu.tsx
+        │   │   ├── field.tsx
+        │   │   ├── hero.tsx
+        │   │   ├── input-group.tsx
+        │   │   ├── input.tsx
+        │   │   ├── label.tsx
+        │   │   ├── select.tsx
+        │   │   ├── separator.tsx
+        │   │   ├── slider.tsx
+        │   │   ├── sonner.tsx                 # Toast notifications
+        │   │   ├── switch.tsx
+        │   │   ├── tabs.tsx
+        │   │   ├── textarea.tsx
+        │   │   ├── toggle-group.tsx
+        │   │   └── toggle.tsx
+        │   │
+        │   └── vendor/                        # Vendor Role Components
+        │       ├── CreateMenuModal.tsx
+        │       ├── RestaurantCreatePage.tsx
+        │       ├── RestaurantSwitcher.tsx
+        │       ├── Sidebar.tsx
+        │       ├── Topbar.tsx
+        │       ├── VenderPrepPage.tsx
+        │       ├── VendorSettingsPage.tsx
+        │       └── Dashboard/                 # Vendor Dashboard Components
+        │           ├── AnalyticsCard.tsx
+        │           ├── Charts.tsx
+        │           └── Dashboard.tsx
+        │
+        ├── context/                           # React Context Providers
+        │   └── VendorContext.tsx
+        │
+        ├── hooks/                             # Custom React Hooks
+        │   ├── useCustomerApi.ts
+        │   ├── userCourierApi.ts
+        │   └── useVendorApi.ts
+        │
+        ├── integrations/                      # Third-party Integrations
+        │   └── tanstack-query/                # TanStack Query configuration
+        │
+        ├── lib/                               # Utility Libraries
+        │   └── utils.ts                       # Helper functions
+        │
+        ├── routes/                            # Route Components (TanStack Router)
+        │   ├── __root.tsx                     # Root layout
+        │   ├── _authenticated.tsx             # Authenticated layout wrapper
+        │   ├── auth.tsx                       # Authentication page
+        │   ├── index.tsx                      # Homepage
+        │   │
+        │   └── _authenticated/                # Protected Routes
+        │       ├── dashboard.tsx              # Main dashboard
+        │       │
+        │       ├── courier/                   # Courier Routes
+        │       │   └── index.tsx
+        │       │
+        │       ├── customer/                  # Customer Routes
+        │       │   ├── index.tsx              # Customer dashboard
+        │       │   ├── checkout.tsx           # Checkout page
+        │       │   ├── orders.tsx             # Order history
+        │       │   ├── restaurant.$restaurantId.tsx  # Restaurant details
+        │       │   └── route.tsx              # Customer layout
+        │       │
+        │       └── vendor/                    # Vendor Routes
+        │           ├── index.tsx              # Vendor dashboard
+        │           ├── menu.tsx               # Menu management
+        │           ├── prep.tsx               # Order preparation
+        │           ├── settings.tsx           # Vendor settings
+        │           ├── route.tsx              # Vendor layout
+        │           └── restaurants/           # Restaurant management
+        │               └── create/            # Create restaurant
+        │
+        ├── schemas/                           # Validation Schemas (Zod)
+        │   └── signup-login.ts
+        │
+        ├── services/                          # API Service Layer
+        │   ├── courier.ts                     # Courier API calls
+        │   ├── customer.ts                    # Customer API calls
+        │   └── vendor.ts                      # Vendor API calls
+        │
+        ├── store/                             # State Management (Zustand)
+        │   └── useCartStore.ts                # Shopping cart state
+        │
+        └── utils/                             # Utility Functions
+            └── upload.ts                      # File upload utilities
 ```
+
+</details>
 
 ## ⚙️ Prerequisites
 
