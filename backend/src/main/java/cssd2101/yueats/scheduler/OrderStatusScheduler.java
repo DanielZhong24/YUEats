@@ -22,7 +22,6 @@ public class OrderStatusScheduler {
 
     @Scheduled(fixedRate = 60000)
     private void updateOrder() {
-        // Add OrderStatus.PENDING to the list below ⬇️
         List<OrderStatus> statuses = List.of(OrderStatus.PENDING, OrderStatus.PREPARING);
         List<Order> orders = orderRepository.findByStatusIn(statuses);
 
