@@ -1,21 +1,8 @@
-# YUEats 🍔
+# YUEats
 
 A full-stack food delivery platform built with Spring Boot and React, featuring separate interfaces for customers, vendors (restaurants), and couriers.
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
-- [API Documentation](#api-documentation)
-- [Development](#development)
-- [License](#license)
-
-## ✨ Features
+## Features
 
 ### Customer Features
 
@@ -50,7 +37,7 @@ A full-stack food delivery platform built with Spring Boot and React, featuring 
 
 ### Backend
 
-- **Framework:** Spring Boot 3.5.7
+- **Framework:** Spring Boot
 - **Java Version:** 21
 - **Database:** PostgreSQL
 - **ORM:** Spring Data JPA (Hibernate)
@@ -59,18 +46,18 @@ A full-stack food delivery platform built with Spring Boot and React, featuring 
 
 ### Frontend
 
-- **Framework:** React 19.2.0
-- **Language:** TypeScript 5.7.2
+- **Framework:** React
+- **Language:** TypeScript
 - **Routing:** TanStack Router
 - **State Management:** Zustand, TanStack Query
 - **Forms:** TanStack Form, React Hook Form
 - **UI Components:** Radix UI
-- **Styling:** Tailwind CSS 4.0.6
-- **Build Tool:** Vite 7.1.7
+- **Styling:** Tailwind CSS
+- **Build Tool:** Vite
 - **HTTP Client:** Axios
 - **Package Manager:** pnpm
 
-## 📁 Project Structure
+## Project Structure
 
 <details>
 <summary><strong>Click to expand full project structure</strong></summary>
@@ -324,7 +311,7 @@ YUEats/
 
 </details>
 
-## ⚙️ Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -333,7 +320,7 @@ Before you begin, ensure you have the following installed:
 - **PostgreSQL 12+**
 - **Maven 3.8+** (or use the included Maven wrapper)
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone the repository
 
@@ -390,7 +377,7 @@ The backend is configured through [application.properties](backend/src/main/reso
 
 The frontend connects to the backend API. If your backend runs on a different port or host, update the API base URL in the service files located in [src/services/](frontend/src/services/).
 
-## 🏃 Running the Application
+## Running the Application
 
 ### Start the Backend
 
@@ -419,7 +406,7 @@ Open your browser and navigate to:
 - **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:8080
 
-## 📚 API Documentation
+## API Documentation
 
 The backend provides RESTful APIs for:
 
@@ -432,7 +419,7 @@ The backend provides RESTful APIs for:
 
 API endpoints are organized by user role (customer, vendor, courier).
 
-## 💻 Development
+## Development
 
 ### Backend Development
 
@@ -483,15 +470,3 @@ pnpm build
 ```
 
 The production build will be in the `dist/` directory.
-
-## 📝 License
-
-This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
