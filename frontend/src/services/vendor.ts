@@ -3,9 +3,10 @@ import axios from 'axios'
 // --- Type Definitions ---
 
 export type Restaurant = {
-  id: string
-  name: string
-  address?: string
+  id: number
+  restaurantName: string
+  address: string
+  bannerImgUrl?: string
 }
 
 export type RestaurantCreationRequest = {
@@ -71,11 +72,17 @@ export async function updateMenuItem(
   itemId: number,
   data: Partial<CreateMenuItemData>,
 ) {
-  const res = await api.put(`/restaurants/${restaurantId}/menu-items/${itemId}`, data)
+  const res = await api.put(
+    `/restaurants/${restaurantId}/menu-items/${itemId}`,
+    data,
+  )
   return res.data
 }
 
-export async function deleteMenuItem(restaurantId: number | string, itemId: number) {
+export async function deleteMenuItem(
+  restaurantId: number | string,
+  itemId: number,
+) {
   await api.delete(`/restaurants/${restaurantId}/menu-items/${itemId}`)
 }
 

@@ -22,11 +22,11 @@ export default function RestaurantSwitcher({
     <select
       className={`bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 font-semibold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer ${className}`}
       value={activeRestaurantId || ''}
-      onChange={(e) => setActiveRestaurantId(e.target.value)}
+      onChange={(e) => setActiveRestaurantId(Number(e.target.value))}
     >
       {restaurants.map((r: any) => (
         <option key={r.id} value={r.id}>
-          {r.name}
+          {r.restaurantName}
         </option>
       ))}
     </select>
